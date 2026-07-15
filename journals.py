@@ -58,7 +58,12 @@ def _request(cfg: Config, path: str, params: Optional[dict] = None) -> dict:
                     f"Rate limited by Zoho after {MAX_RETRIES} retries calling {url}"
                 )
             retry_after = response.headers.get("Retry-After")
-            delay = float(retry_after) if retry_after else BACKOFF_SECONDS[attempt]
+            try:
+                delay = float(retry_after) if retry_after else BACKOFF_SECONDS[attempt]
+            except (TypeError, ValueError):
+                # Retry-After may be an HTTP-date string (RFC 7231) rather than
+                # an integer number of seconds; fall back to our own backoff.
+                delay = BACKOFF_SECONDS[attempt]
             time.sleep(delay)
             attempt += 1
             continue
