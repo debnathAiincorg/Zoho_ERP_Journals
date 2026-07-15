@@ -1,0 +1,6 @@
+zoho_tokens.json
+journals_output.json
+.env
+__pycache__/
+*.pyc
+venv/
