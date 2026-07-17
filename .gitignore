@@ -1,5 +1,5 @@
-zoho_tokens.json
 journals_output.json
+journal_*.json
 .env
 __pycache__/
 *.pyc

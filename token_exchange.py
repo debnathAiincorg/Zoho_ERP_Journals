@@ -4,11 +4,13 @@ Run this once per OAuth setup. ZOHO_GRANT_TOKEN is single-use and expires in
 ~10 minutes, so re-running this after a successful exchange will fail --
 that's expected; generate a fresh grant token from the Zoho API console if
 you need to re-run it.
+
+The resulting access_token, refresh_token, and expiry are written directly
+into .env (ZOHO_ACCESS_TOKEN, ZOHO_REFRESH_TOKEN, ZOHO_TOKEN_EXPIRES_AT).
 """
 import sys
 
-from auth import AuthError, exchange_grant_token
-from config import Config, ConfigError, load_config
+from zoho_client import AuthError, Config, ConfigError, exchange_grant_token, load_config
 
 
 def main() -> int:
@@ -24,7 +26,7 @@ def main() -> int:
         print(f"Token exchange failed: {exc}")
         return 1
 
-    print("Token exchange succeeded. Saved to zoho_tokens.json.")
+    print("Token exchange succeeded. Saved to .env.")
     print(f"Access token expires at (epoch): {tokens['expires_at']:.0f}")
     return 0
 
