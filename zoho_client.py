@@ -271,6 +271,27 @@ def get_valid_access_token(cfg: Config) -> str:
 MAX_RETRIES = 3
 BACKOFF_SECONDS = (2, 4, 8)
 
+# Zoho ERP enforces a 100-requests-per-minute cap per organization. Scripts
+# that fetch full detail for every record in a list (e.g. fetch_journals.py
+# calling get_journal() once per journal -- 165+ calls in one run) can blow
+# past that cap in well under a minute without deliberate pacing, since 429
+# backoff alone only reacts *after* the limit has already been hit. Spacing
+# every outgoing request at least MIN_REQUEST_INTERVAL apart caps sustained
+# throughput at ~92 requests/minute, comfortably under the limit.
+MIN_REQUEST_INTERVAL = 0.65
+_last_request_time = 0.0
+
+
+def _throttle() -> None:
+    """Sleep just long enough to keep requests at least MIN_REQUEST_INTERVAL
+    apart, measured from the last call anywhere in this process. A no-op if
+    enough time has already passed (e.g. between bursts)."""
+    global _last_request_time
+    wait = MIN_REQUEST_INTERVAL - (time.time() - _last_request_time)
+    if wait > 0:
+        time.sleep(wait)
+    _last_request_time = time.time()
+
 
 class ZohoAPIError(Exception):
     """Raised when Zoho ERP returns an error, whether via HTTP status or body code."""
@@ -298,6 +319,7 @@ def _request(cfg: Config, path: str, params: Optional[dict] = None) -> dict:
     attempt = 0
 
     while True:
+        _throttle()
         try:
             response = requests.get(
                 url,

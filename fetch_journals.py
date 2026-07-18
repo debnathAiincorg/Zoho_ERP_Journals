@@ -15,6 +15,17 @@ embedded JSON block inside journals_dashboard.html
 contain Pay Order records, so journals_dashboard.html is self-contained and
 works when double-clicked from file:// -- no local server needed.
 
+The /erp/v3/journals LIST endpoint (used above) is summary-level only -- it
+does not include a journal's `notes` field or its line items. To populate a
+Description column, this script also calls get_journal() (GET
+/erp/v3/journals/{journal_id}) once per matched journal and pulls `notes`
+from that detail response into a "description" field on each output record
+(same fallback source as ledgers_dashboard.html's Description column -- see
+_line_entries_for_account() in fetch_ledgers.py). That's one extra API call
+per Pay Order journal -- roughly 165+ calls in a full run against this org --
+so it relies on the pacing added to zoho_client.py's _request() (see
+MIN_REQUEST_INTERVAL there) to stay under Zoho's 100-requests-per-minute cap.
+
 Requires a completed OAuth setup (run token_exchange.py once first) -- this
 script only handles ongoing auto-refresh, never the initial grant-token
 exchange.
@@ -142,6 +153,22 @@ def main(argv=None) -> int:
             matched = len(result)
             print(f"Scanned {total_scanned} journal(s); {matched} matched the \"Pay Order\" "
                   f"reference-number filter ({total_scanned - matched} filtered out).")
+
+            detail_errors = 0
+            for i, record in enumerate(result, start=1):
+                try:
+                    detail = get_journal(cfg, record["journal_id"])
+                    record["description"] = detail["raw"].get("notes") or ""
+                except (AuthError, ZohoAPIError) as exc:
+                    print(f"  WARNING: could not fetch detail for journal {record['journal_id']}: {exc}")
+                    record["description"] = ""
+                    detail_errors += 1
+                if matched >= 20 and i % 20 == 0:
+                    print(f"  ...fetched detail for {i}/{matched} journal(s)")
+            print(f"Fetched full detail for {matched} journal(s) to populate descriptions"
+                  + (f" ({detail_errors} error(s), description left blank for those)" if detail_errors else "")
+                  + ".")
+
             out_path = args.out or DEFAULT_OUT
             with open(out_path, "w", encoding="utf-8") as f:
                 json.dump(result, f, indent=2)
