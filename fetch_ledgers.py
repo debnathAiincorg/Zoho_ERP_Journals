@@ -110,8 +110,16 @@ def _in_date_range(date_value, date_from, date_to) -> bool:
 
 
 def _line_entries_for_account(journal: dict, account_id: str) -> list:
-    """Pull just the line item(s) touching account_id out of a full journal detail."""
+    """Pull just the line item(s) touching account_id out of a full journal detail.
+
+    Journal line items are almost always missing their own description --
+    confirmed live, the account-level detail is recorded in the journal's
+    free-text `notes` field instead. Fall back to that (same pattern as the
+    reference petty-cash script: line item description, else journal notes,
+    else empty), rather than shipping a blank Description column.
+    """
     entries = []
+    notes = journal["raw"].get("notes") or ""
     for item in journal["raw"].get("line_items", []):
         if item.get("account_id") != account_id:
             continue
@@ -122,7 +130,7 @@ def _line_entries_for_account(journal: dict, account_id: str) -> list:
             "source_id": journal["journal_id"],
             "date": journal["date"],
             "reference_number": journal["reference_number"],
-            "description": item.get("description") or "",
+            "description": item.get("description") or notes,
             "debit_amount": amount if is_debit else 0,
             "credit_amount": amount if not is_debit else 0,
         })
@@ -136,8 +144,15 @@ def _line_entries_for_bill_account(bill: dict, account_id: str) -> list:
     items) -- but a Bill always debits whichever account(s) its line items
     are allocated to (Dr Expense/Asset, Cr Accounts Payable), so every
     matching line item here is unconditionally a debit.
+
+    Same description fallback as journals: bills also have a free-text
+    `notes` field (confirmed live, populated with real text) -- fall back
+    to it when a line item has no description of its own. In practice
+    most bill line items already carry their own description, so this
+    mostly matters for the ones that don't.
     """
     entries = []
+    notes = bill.get("notes") or ""
     for item in bill.get("line_items", []):
         if item.get("account_id") != account_id:
             continue
@@ -147,7 +162,7 @@ def _line_entries_for_bill_account(bill: dict, account_id: str) -> list:
             "source_id": bill.get("bill_id"),
             "date": bill.get("date"),
             "reference_number": bill.get("reference_number") or "",
-            "description": item.get("description") or "",
+            "description": item.get("description") or notes,
             "debit_amount": amount,
             "credit_amount": 0,
         })

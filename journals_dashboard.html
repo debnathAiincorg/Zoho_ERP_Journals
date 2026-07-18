@@ -3,6 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- GitHub Pages serves this file with `Cache-Control: max-age=600` (its
+     fixed default -- static hosting, no per-repo header control) and
+     browsers are standards-compliant in reusing a cached copy for up to
+     10 minutes without revalidating. These http-equiv meta tags ask the
+     browser to skip that caching; be aware Chrome and most modern
+     browsers largely IGNORE http-equiv Cache-Control/Pragma/Expires for
+     actual HTTP caching decisions (those only apply to real response
+     headers, which GitHub Pages doesn't let us set). This is a
+     best-effort mitigation, not a guarantee -- a hard refresh
+     (Ctrl+Shift+R) always bypasses the cache regardless. -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Zoho ERP Journals Dashboard</title>
 <style>
   :root {
