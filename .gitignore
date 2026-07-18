@@ -1,5 +1,6 @@
 
 journal_*.json
+ledgers_output.json
 .env
 __pycache__/
 *.pyc

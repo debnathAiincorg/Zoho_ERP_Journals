@@ -1,4 +1,4 @@
-"""Fetch journal entries from Zoho ERP and write them for dashboard.html.
+"""Fetch journal entries from Zoho ERP and write them for journals_dashboard.html.
 
 This is the one script to run whenever you want fresh data:
 
@@ -10,10 +10,10 @@ Every full-list fetch is restricted to journals whose reference_number is
 some format/case variant of "Pay Order" (e.g. "PAY ORDER", "Pay-Order",
 "PayOrder") -- everything else (FD, FD - SM, etc.) is scanned but filtered
 out before it ever reaches disk. journals_output.json (the raw data) and the
-embedded JSON block inside dashboard.html
+embedded JSON block inside journals_dashboard.html
 (<script type="application/json" id="journals-data">) therefore only ever
-contain Pay Order records, so dashboard.html is self-contained and works
-when double-clicked from file:// -- no local server needed.
+contain Pay Order records, so journals_dashboard.html is self-contained and
+works when double-clicked from file:// -- no local server needed.
 
 Requires a completed OAuth setup (run token_exchange.py once first) -- this
 script only handles ongoing auto-refresh, never the initial grant-token
@@ -36,7 +36,7 @@ from zoho_client import (
 
 VALID_STATUSES = ("draft", "published", "approved", "submitted", "rejected")
 DEFAULT_OUT = "journals_output.json"
-DASHBOARD_HTML = "dashboard.html"
+DASHBOARD_HTML = "journals_dashboard.html"
 DATA_BLOCK_RE = re.compile(
     r'(<script type="application/json" id="journals-data">)(.*?)(</script>)',
     re.DOTALL,
@@ -86,7 +86,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _update_dashboard_html(records: list, path: str) -> bool:
-    """Replace the JSON content inside dashboard.html's embedded
+    """Replace the JSON content inside journals_dashboard.html's embedded
     <script type="application/json" id="journals-data"> block with freshly
     fetched data. Returns True if the block was found and updated, False
     otherwise (caller should warn, not crash).
@@ -150,7 +150,7 @@ def main(argv=None) -> int:
             if _update_dashboard_html(result, DASHBOARD_HTML):
                 print(f"Updated embedded data in {DASHBOARD_HTML}")
                 print()
-                print("dashboard.html updated with this run's data -- just open it "
+                print(f"{DASHBOARD_HTML} updated with this run's data -- just open it "
                       "directly, no server needed.")
             else:
                 print(f"Warning: could not find the journals-data script block in "

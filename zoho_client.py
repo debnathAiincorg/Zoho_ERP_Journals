@@ -365,9 +365,15 @@ def list_journals(
     status: Optional[str] = None,
     date_start: Optional[str] = None,
     date_end: Optional[str] = None,
+    account_id: Optional[str] = None,
     page_size: int = 200,
 ) -> list:
     """Fetch all journals matching the given filters, paginating until exhausted.
+
+    `account_id` is CONFIRMED working server-side (verified live: the
+    response's page_context.search_criteria shows column_name "account_id",
+    comparator "equal", matched against the target account's name) -- use it
+    to get every journal that touches a given ledger account.
 
     NOTE: `date_start`/`date_end` are sent using the param names below, which
     are ASSUMED based on common Zoho API convention and have NOT been
@@ -384,6 +390,8 @@ def list_journals(
         params["date_start"] = date_start
     if date_end:
         params["date_end"] = date_end
+    if account_id:
+        params["account_id"] = account_id
 
     journals = []
     while True:
@@ -415,3 +423,102 @@ def get_journal(cfg: Config, journal_id: str) -> dict:
     )
     raw = body.get("journal", body)
     return _normalize_journal(raw)
+
+
+# ============================================================================
+# Bills API
+# ============================================================================
+# Ledger totals built from /erp/v3/journals alone undercount against Zoho's
+# own Account Transactions report, because that report aggregates every
+# transaction type posting to an account -- not just Journals. Bills are a
+# second, confirmed-reachable source: GET /erp/v3/bills?account_id=... is
+# CONFIRMED working server-side (verified live: page_context.search_criteria
+# echoes column_name "account_id", comparator "equal", matched against the
+# target account's name -- e.g. "OFFICE 2 PROJECT."), and each bill's detail
+# includes line_items with a per-line account_id. (/erp/v3/expenses and
+# /erp/v3/creditnotes 401 with the current OAuth scope and are not available
+# here; /erp/v3/vendorpayments and /erp/v3/customerpayments were checked and
+# confirmed to silently ignore the account_id param entirely -- no
+# search_criteria echoed at all -- matching the same unreliable-filter
+# pattern seen before on those two endpoints, and structurally they settle
+# already-recorded bills/invoices rather than posting fresh amounts to an
+# expense account, so they're not a relevant data source for these ledgers
+# even setting the filter issue aside.)
+
+def list_bills(
+    cfg: Config,
+    account_id: Optional[str] = None,
+    date_start: Optional[str] = None,
+    date_end: Optional[str] = None,
+    page_size: int = 200,
+) -> list:
+    """Fetch all bills matching the given filters, paginating until exhausted."""
+    params = {"organization_id": cfg.organization_id, "per_page": page_size, "page": 1}
+    if date_start:
+        params["date_start"] = date_start
+    if date_end:
+        params["date_end"] = date_end
+    if account_id:
+        params["account_id"] = account_id
+
+    bills = []
+    while True:
+        body = _request(cfg, "/erp/v3/bills", params=params)
+        bills.extend(body.get("bills", []))
+
+        page_context = body.get("page_context", {})
+        if not page_context.get("has_more_page"):
+            break
+        params["page"] += 1
+
+    return bills
+
+
+def get_bill(cfg: Config, bill_id: str) -> dict:
+    """Fetch a single bill by ID, including its line_items."""
+    body = _request(
+        cfg,
+        f"/erp/v3/bills/{bill_id}",
+        params={"organization_id": cfg.organization_id},
+    )
+    return body.get("bill", body)
+
+
+# ============================================================================
+# Chart of Accounts
+# ============================================================================
+# Confirmed live against this org: GET /erp/v3/chartofaccounts works with the
+# currently granted scopes and returns account_id/account_name pairs, used to
+# resolve a ledger's human-readable name to its account_id.
+#
+# (GET /erp/v3/reports/generalledger was tried for per-account ledger data
+# and abandoned: it's a real, reachable path -- 401s, not 404s, and the bare
+# /erp/v3/reports path 401s identically -- but it 401s regardless of scope,
+# including after a clean grant-token regeneration with an added scope.
+# Ledger-style data is fetched instead by filtering the regular
+# /erp/v3/journals list by account_id -- see list_journals()'s account_id
+# param above and fetch_ledgers.py, which pulls each matching journal's line
+# items via get_journal().)
+
+def get_chart_of_accounts(cfg: Config, page_size: int = 200) -> list:
+    """Fetch the full Chart of Accounts, paginating until exhausted."""
+    params = {"organization_id": cfg.organization_id, "per_page": page_size, "page": 1}
+    accounts = []
+    while True:
+        body = _request(cfg, "/erp/v3/chartofaccounts", params=params)
+        accounts.extend(body.get("chartofaccounts", []))
+
+        page_context = body.get("page_context", {})
+        if not page_context.get("has_more_page"):
+            break
+        params["page"] += 1
+
+    return accounts
+
+
+def find_account_id(accounts: list, account_name: str) -> Optional[str]:
+    """Exact, case-sensitive match on account_name (e.g. a trailing '.' matters)."""
+    for account in accounts:
+        if account.get("account_name") == account_name:
+            return account.get("account_id")
+    return None

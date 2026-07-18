@@ -1,0 +1,2829 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zoho ERP Ledgers Dashboard</title>
+<style>
+  :root {
+    --surface-1:      #ffffff;
+    --page-plane:     #dceedc;
+    --text-primary:   #10241a;
+    --text-secondary: #445c4c;
+    --text-muted:     #5a6c5e;
+    --gridline:       #d7e6d6;
+    --border:         rgba(16,36,26,0.16);
+    --border-strong:  rgba(16,36,26,0.24);
+    --card-shadow:    0 1px 2px rgba(16,36,26,0.05), 0 6px 16px rgba(16,36,26,0.08);
+    --accent:         #2a78d6;
+    --focus-ring:      #2a78d6;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+  .page { max-width: 1280px; margin: 0 auto; padding: 24px 24px 64px; }
+
+  a, button { font-family: inherit; }
+  button { cursor: pointer; }
+  button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* ---------- Site nav ---------- */
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+    border-radius: 12px;
+    padding: 8px 10px;
+    margin-bottom: 16px;
+  }
+  .site-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+  .site-nav-link:hover { background: #f1f1ef; color: var(--text-primary); }
+  .site-nav-link.active { background: rgba(42,120,214,0.12); color: var(--accent); }
+  .site-nav-home-tag { font-size: 0.6875rem; font-weight: 600; color: var(--text-muted); }
+  .site-nav-link.active .site-nav-home-tag { color: var(--accent); opacity: 0.75; }
+  .site-nav-divider { width: 1px; align-self: stretch; background: var(--border); margin: 4px 2px; }
+  .site-nav-group-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+    padding: 0 2px 0 8px;
+    white-space: nowrap;
+  }
+  .site-nav-sublink { font-weight: 500; }
+
+  @media (max-width: 720px) {
+    .site-nav-divider { display: none; }
+    .site-nav-group-label { padding-left: 0; width: 100%; }
+  }
+
+  /* ---------- Top bar ---------- */
+  /* Card-styled (like every other section) so its title text sits on the
+     bright --surface-1 background rather than directly on the saturated
+     --page-plane green, which would cap heading contrast to a razor-thin
+     ~4.5:1 no matter whether the text were black or white. */
+  .topbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+    border-radius: 12px;
+    padding: 18px 22px;
+  }
+  .topbar h1 {
+    font-size: 1.375rem;
+    font-weight: 700;
+    margin: 0;
+  }
+  .ledger-subtitle {
+    margin: 4px 0 0;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  .btn {
+    appearance: none;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: 1px solid var(--border-strong);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    transition: background 0.12s ease, border-color 0.12s ease;
+  }
+  .btn:hover { background: #f1f1ef; }
+  .btn-ghost {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-secondary);
+  }
+  .btn-ghost:hover { background: #eeeeec; }
+  .btn-ghost:disabled { opacity: 0.45; cursor: default; }
+  .btn:disabled:hover { background: inherit; }
+
+  /* ---------- Status panel (loading / error / empty) ---------- */
+  .status-panel {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+    border-radius: 12px;
+    padding: 32px 24px;
+    text-align: center;
+    color: var(--text-secondary);
+  }
+  .status-panel.error {
+    text-align: left;
+    border-color: rgba(208,59,59,0.35);
+    background: rgba(208,59,59,0.06);
+  }
+  .status-panel h2 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+    color: var(--text-primary);
+  }
+  .status-panel .error-icon { color: #d03b3b; font-weight: 700; }
+  .status-panel code {
+    background: #eeeeec;
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 0.85em;
+  }
+
+  /* ---------- Summary bar (stat tiles) ---------- */
+  .summary-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .stat-tile {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .stat-tile .stat-label {
+    font-size: 1.0625rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin: 0 0 6px;
+  }
+  .stat-tile .stat-value {
+    font-size: 1.28775rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+
+  /* ---------- Filters row ---------- */
+  .filters-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+  }
+  .filters-row .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .filters-row label.field-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .filters-row input,
+  .filters-row select {
+    font-size: 0.875rem;
+    padding: 7px 10px;
+    border-radius: 7px;
+    border: 1px solid var(--border-strong);
+    background: #ffffff;
+    color: var(--text-primary);
+  }
+  .filters-row .field-search { min-width: 240px; flex: 1 1 240px; }
+  #searchInput { width: 100%; }
+  .filters-row .date-fields { display: flex; gap: 8px; }
+  .filters-row .date-fields input { width: 150px; }
+  .filters-spacer { flex: 1 1 auto; }
+  .result-count {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  /* ---------- Table ---------- */
+  .table-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; min-width: 640px; }
+  thead th {
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--gridline);
+    white-space: nowrap;
+    user-select: none;
+  }
+  thead th.sortable { cursor: pointer; }
+  thead th.sortable:hover { color: var(--text-secondary); }
+  thead th.num { text-align: right; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--gridline); vertical-align: middle; }
+  .muted-cell { color: var(--text-muted); }
+
+  .empty-note {
+    padding: 32px 16px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+  }
+
+  /* ---------- Pagination ---------- */
+  /* Card-styled for the same reason as .topbar: --text-muted/--text-secondary
+     need to sit on --surface-1, not directly on the saturated --page-plane. */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+    border-radius: 12px;
+    padding: 12px 16px;
+  }
+  #pageInfo { font-size: 0.8125rem; color: var(--text-muted); }
+  .page-buttons { display: flex; gap: 8px; align-items: center; }
+  .page-buttons .page-current {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    padding: 0 6px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  [hidden] { display: none !important; }
+
+  @media (max-width: 720px) {
+    .page { padding: 16px 14px 48px; }
+    .filters-row { flex-direction: column; align-items: stretch; }
+    .filters-row .field-search { min-width: 0; flex: 1 1 auto; }
+    .filters-row .date-fields { flex-direction: column; }
+    .filters-row .date-fields input { width: 100%; }
+    .filters-spacer { display: none; }
+  }
+</style>
+</head>
+<body>
+  <script type="application/json" id="ledgers-data">{
+  "OFFICE 1 WASHROOM PROJECT": {
+    "account_id": "3545384000001465002",
+    "entries": [
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001844039",
+        "date": "2026-07-18",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001844045",
+        "date": "2026-07-18",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001737014",
+        "date": "2026-07-17",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 90.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001833022",
+        "date": "2026-07-17",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001842049",
+        "date": "2026-07-17",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 976.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001851001",
+        "date": "2026-07-17",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1600.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001764001",
+        "date": "2026-07-16",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001801070",
+        "date": "2026-07-16",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001809017",
+        "date": "2026-07-16",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001824033",
+        "date": "2026-07-16",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1160.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001813070",
+        "date": "2026-07-15",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 0,
+        "credit_amount": 200.0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001772011",
+        "date": "2026-07-14",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 300.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001766032",
+        "date": "2026-07-13",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001774038",
+        "date": "2026-07-13",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 450.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001783065",
+        "date": "2026-07-13",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 2350.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001787009",
+        "date": "2026-07-13",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001763026",
+        "date": "2026-07-11",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001765036",
+        "date": "2026-07-11",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 75.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001786001",
+        "date": "2026-07-11",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 2350.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001691021",
+        "date": "2026-07-10",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 850.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001761001",
+        "date": "2026-07-10",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001762001",
+        "date": "2026-07-10",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 2350.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001763001",
+        "date": "2026-07-10",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 360.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001712027",
+        "date": "2026-07-09",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 360.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001741009",
+        "date": "2026-07-09",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 7080.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001744009",
+        "date": "2026-07-09",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001755001",
+        "date": "2026-07-09",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 440.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001677054",
+        "date": "2026-07-08",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 45.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001716033",
+        "date": "2026-07-08",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 90.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001720018",
+        "date": "2026-07-08",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001727064",
+        "date": "2026-07-08",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1900.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001729013",
+        "date": "2026-07-08",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1350.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001712021",
+        "date": "2026-07-07",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001729007",
+        "date": "2026-07-07",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001615031",
+        "date": "2026-07-06",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 45.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001688001",
+        "date": "2026-07-06",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 600.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001693025",
+        "date": "2026-07-06",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001696193",
+        "date": "2026-07-06",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001697035",
+        "date": "2026-07-06",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001714001",
+        "date": "2026-07-06",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 40.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001679033",
+        "date": "2026-07-05",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 2530.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001677001",
+        "date": "2026-07-04",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001685014",
+        "date": "2026-07-04",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 3092.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001698030",
+        "date": "2026-07-04",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001648001",
+        "date": "2026-07-02",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001649001",
+        "date": "2026-07-02",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 20.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001651001",
+        "date": "2026-07-02",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 7600.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001652001",
+        "date": "2026-07-02",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 130.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001653001",
+        "date": "2026-07-02",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 50.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001666001",
+        "date": "2026-07-02",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 2150.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001630061",
+        "date": "2026-07-01",
+        "reference_number": "pay order",
+        "description": "",
+        "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001630067",
+        "date": "2026-07-01",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 50.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001643001",
+        "date": "2026-07-01",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001644001",
+        "date": "2026-07-01",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 850.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001617001",
+        "date": "2026-06-30",
+        "reference_number": "Pay order ",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001617018",
+        "date": "2026-06-30",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1700.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001624009",
+        "date": "2026-06-30",
+        "reference_number": "Pay order",
+        "description": "",
+        "debit_amount": 4672.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001633038",
+        "date": "2026-06-30",
+        "reference_number": "pay order",
+        "description": "",
+        "debit_amount": 5990.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001638001",
+        "date": "2026-06-30",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001639009",
+        "date": "2026-06-30",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001640007",
+        "date": "2026-06-30",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 778.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001641001",
+        "date": "2026-06-30",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 30.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001597029",
+        "date": "2026-06-29",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001598016",
+        "date": "2026-06-29",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 700.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001600053",
+        "date": "2026-06-29",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 130.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001601019",
+        "date": "2026-06-29",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001608009",
+        "date": "2026-06-29",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 3000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001608015",
+        "date": "2026-06-29",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001572038",
+        "date": "2026-06-27",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 1850.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001582018",
+        "date": "2026-06-27",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 150.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001585029",
+        "date": "2026-06-27",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 30.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001585029",
+        "date": "2026-06-27",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 80.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001592001",
+        "date": "2026-06-27",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 200.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001594033",
+        "date": "2026-06-27",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 2500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001600028",
+        "date": "2026-06-27",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001609009",
+        "date": "2026-06-27",
+        "reference_number": "PAY ODER",
+        "description": "",
+        "debit_amount": 3076.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001554010",
+        "date": "2026-06-26",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001550001",
+        "date": "2026-06-25",
+        "reference_number": "PAY ORDER",
+        "description": "SANTRASH",
+        "debit_amount": 1300.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001550001",
+        "date": "2026-06-25",
+        "reference_number": "PAY ORDER",
+        "description": "MATERIAL",
+        "debit_amount": 440.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001524007",
+        "date": "2026-06-24",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 124.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001532012",
+        "date": "2026-06-24",
+        "reference_number": "PAY ORDER",
+        "description": "1700",
+        "debit_amount": 1700.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001513011",
+        "date": "2026-06-23",
+        "reference_number": "Pay order",
+        "description": "",
+        "debit_amount": 200.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001515001",
+        "date": "2026-06-23",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 4000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001525001",
+        "date": "2026-06-23",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 200.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001486001",
+        "date": "2026-06-22",
+        "reference_number": "PAY ORDER",
+        "description": "LABOUR",
+        "debit_amount": 3350.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001486001",
+        "date": "2026-06-22",
+        "reference_number": "PAY ORDER",
+        "description": "MATIRIAL",
+        "debit_amount": 100.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001488001",
+        "date": "2026-06-22",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 3980.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001438040",
+        "date": "2026-06-20",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 2850.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001478001",
+        "date": "2026-06-20",
+        "reference_number": "",
+        "description": "Payment to Rohit through petty cash\nWashroom Renovation \n\n 20.06.26\nKerosin- 2L",
+        "debit_amount": 200.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001478001",
+        "date": "2026-06-20",
+        "reference_number": "",
+        "description": "Payment to Rohit\nReservoir wall work \n\n20.06.26\nSoda  - 500g- 45/-",
+        "debit_amount": 45.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001484001",
+        "date": "2026-06-20",
+        "reference_number": "PAY ORDER",
+        "description": "Basta purchase for o1 washroom renovation purpose",
+        "debit_amount": 100.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001484001",
+        "date": "2026-06-20",
+        "reference_number": "PAY ORDER",
+        "description": "Payment to Pratim \nReservoir wall work \n\n20.06.26\nStone chip  - 3- 450/-\nTransport - 50",
+        "debit_amount": 450.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001484001",
+        "date": "2026-06-20",
+        "reference_number": "PAY ORDER",
+        "description": "Payment to Pratim \nLabour tiffin expense\n\n20.06.26\nTea- 5 - 30/-\nBiscuit -1- 2/-",
+        "debit_amount": 32.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001484001",
+        "date": "2026-06-20",
+        "reference_number": "PAY ORDER",
+        "description": "Payment to @Srijan \nNewspaper purchase \n\n20.06.26\nNewspaper - 2kg - 60/-",
+        "debit_amount": 60.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001435001",
+        "date": "2026-06-19",
+        "reference_number": "Pay order - MATERIAL",
+        "description": "",
+        "debit_amount": 4571.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001438001",
+        "date": "2026-06-19",
+        "reference_number": "Pay order - MATERIAL",
+        "description": "",
+        "debit_amount": 2670.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001449011",
+        "date": "2026-06-19",
+        "reference_number": "Pay order - LABOUR",
+        "description": "",
+        "debit_amount": 2300.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001450020",
+        "date": "2026-06-19",
+        "reference_number": "Pay order - LABOUR",
+        "description": "For 18th",
+        "debit_amount": 2300.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001453017",
+        "date": "2026-06-19",
+        "reference_number": "Pay order",
+        "description": "",
+        "debit_amount": 3000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001445001",
+        "date": "2026-06-18",
+        "reference_number": "",
+        "description": "KMC SAFETY TANK CLEAN ",
+        "debit_amount": 1500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001417001",
+        "date": "2026-06-16",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 4880.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001342128",
+        "date": "2026-06-15",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 4200.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001341049",
+        "date": "2026-06-13",
+        "reference_number": "MATERIAL",
+        "description": "",
+        "debit_amount": 4672.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001349014",
+        "date": "2026-06-13",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 48.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001350021",
+        "date": "2026-06-13",
+        "reference_number": "LABOUR",
+        "description": "",
+        "debit_amount": 2450.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001350032",
+        "date": "2026-06-13",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 1670.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001357011",
+        "date": "2026-06-12",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 2450.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001361001",
+        "date": "2026-06-12",
+        "reference_number": "",
+        "description": "OFFICE 1 WASHROOM WORK RUBBISH DISPOSAL",
+        "debit_amount": 5000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001331006",
+        "date": "2026-06-11",
+        "reference_number": "MATERIAL",
+        "description": "",
+        "debit_amount": 1859.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001333041",
+        "date": "2026-06-11",
+        "reference_number": "LABOUR",
+        "description": "",
+        "debit_amount": 850.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001333041",
+        "date": "2026-06-11",
+        "reference_number": "LABOUR",
+        "description": "",
+        "debit_amount": 600.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001333041",
+        "date": "2026-06-11",
+        "reference_number": "LABOUR",
+        "description": "",
+        "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001334001",
+        "date": "2026-06-11",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 1.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001335001",
+        "date": "2026-06-11",
+        "reference_number": "WASHROOM MATERIAL",
+        "description": "",
+        "debit_amount": 14730.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001336001",
+        "date": "2026-06-11",
+        "reference_number": "LABOUR",
+        "description": "",
+        "debit_amount": 3000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001301001",
+        "date": "2026-06-10",
+        "reference_number": "",
+        "description": "MAINTAINANCE OF OFFICE SEPTIC TANK",
+        "debit_amount": 1500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001302001",
+        "date": "2026-06-10",
+        "reference_number": "",
+        "description": "WASHROOM REPAIR O1 TANK",
+        "debit_amount": 900.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001312010",
+        "date": "2026-06-10",
+        "reference_number": "",
+        "description": "MATERIAL",
+        "debit_amount": 115.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001312010",
+        "date": "2026-06-10",
+        "reference_number": "",
+        "description": "MATERIAL",
+        "debit_amount": 375.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001312010",
+        "date": "2026-06-10",
+        "reference_number": "",
+        "description": "LABOUR",
+        "debit_amount": 1900.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001312010",
+        "date": "2026-06-10",
+        "reference_number": "",
+        "description": "LABOUR",
+        "debit_amount": 1900.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001312010",
+        "date": "2026-06-10",
+        "reference_number": "",
+        "description": "LABOUR",
+        "debit_amount": 3100.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001312010",
+        "date": "2026-06-10",
+        "reference_number": "",
+        "description": "LABOUR MONITORING ",
+        "debit_amount": 2999.0,
+        "credit_amount": 0
+      }
+    ]
+  },
+  "OFFICE 2 PROJECT.": {
+    "account_id": "3545384000000396025",
+    "entries": [
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001764001",
+        "date": "2026-07-16",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001693032",
+        "date": "2026-07-14",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 300.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001785001",
+        "date": "2026-07-11",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 4000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001760001",
+        "date": "2026-07-10",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 2400.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001746009",
+        "date": "2026-07-09",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001744009",
+        "date": "2026-07-09",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001734009",
+        "date": "2026-07-09",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001720018",
+        "date": "2026-07-08",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001728009",
+        "date": "2026-07-06",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 8050.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001693025",
+        "date": "2026-07-06",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001674007",
+        "date": "2026-07-04",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 3250.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001646001",
+        "date": "2026-07-04",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1600.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001680009",
+        "date": "2026-07-04",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1799.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001680015",
+        "date": "2026-07-04",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 840.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001692001",
+        "date": "2026-07-04",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 3630.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001686004",
+        "date": "2026-07-04",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1600.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001698030",
+        "date": "2026-07-04",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001656001",
+        "date": "2026-07-02",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 800.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001648001",
+        "date": "2026-07-02",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001613058",
+        "date": "2026-07-01",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1827.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001620065",
+        "date": "2026-07-01",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 560.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001638001",
+        "date": "2026-06-30",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001617001",
+        "date": "2026-06-30",
+        "reference_number": "Pay order ",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001608015",
+        "date": "2026-06-29",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001601019",
+        "date": "2026-06-29",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001597029",
+        "date": "2026-06-29",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001600035",
+        "date": "2026-06-27",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 250.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001600028",
+        "date": "2026-06-27",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001594033",
+        "date": "2026-06-27",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001572038",
+        "date": "2026-06-27",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001554010",
+        "date": "2026-06-26",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001554010",
+        "date": "2026-06-26",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 390.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001531035",
+        "date": "2026-06-25",
+        "reference_number": "Pay order",
+        "description": "",
+        "debit_amount": 1500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001550001",
+        "date": "2026-06-25",
+        "reference_number": "PAY ORDER",
+        "description": "LABOR",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001526026",
+        "date": "2026-06-24",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 1050.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001531009",
+        "date": "2026-06-24",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 460.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001532012",
+        "date": "2026-06-24",
+        "reference_number": "PAY ORDER",
+        "description": "labor",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001532012",
+        "date": "2026-06-24",
+        "reference_number": "PAY ORDER",
+        "description": "material",
+        "debit_amount": 300.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001523001",
+        "date": "2026-06-23",
+        "reference_number": "Pay order",
+        "description": "",
+        "debit_amount": 1610.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001497009",
+        "date": "2026-06-23",
+        "reference_number": "Pay order",
+        "description": "labour monitoring",
+        "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001494001",
+        "date": "2026-06-22",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 3900.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001474009",
+        "date": "2026-06-22",
+        "reference_number": "PAY ORDER - MATERIAL",
+        "description": "",
+        "debit_amount": 6564.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001455027",
+        "date": "2026-06-20",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 3000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001347036",
+        "date": "2026-06-13",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 25000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001305046",
+        "date": "2026-06-10",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 1.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001123001",
+        "date": "2026-05-31",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 700.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000893009",
+        "date": "2026-05-21",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000879001",
+        "date": "2026-05-21",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 80.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000872020",
+        "date": "2026-05-21",
+        "reference_number": "",
+        "description": "Kothari pipes",
+        "debit_amount": 200.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000863014",
+        "date": "2026-05-21",
+        "reference_number": "",
+        "description": "D. Dasgupta",
+        "debit_amount": 100.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000783001",
+        "date": "2026-05-15",
+        "reference_number": " Petty Expense",
+        "description": "",
+        "debit_amount": 500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001184020",
+        "date": "2026-05-02",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 50.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000353001",
+        "date": "2026-04-09",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 3000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001670012",
+        "date": "2026-03-30",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 10000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001566012",
+        "date": "2026-03-23",
+        "reference_number": "",
+        "description": "MONITORING",
+        "debit_amount": 3600.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001540049",
+        "date": "2026-03-20",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 800.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001352031",
+        "date": "2026-03-16",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 2760.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001342030",
+        "date": "2026-03-14",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 1888.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001368012",
+        "date": "2026-03-14",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 2300.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001195031",
+        "date": "2026-03-09",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001195042",
+        "date": "2026-03-09",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 3500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001184042",
+        "date": "2026-03-06",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 40.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001188026",
+        "date": "2026-03-06",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 7145.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001197017",
+        "date": "2026-03-06",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 3725.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001062032",
+        "date": "2026-03-05",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 10600.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001075001",
+        "date": "2026-03-05",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 850.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001073001",
+        "date": "2026-03-04",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 10000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000957001",
+        "date": "2026-03-02",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 300.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000697020",
+        "date": "2026-02-28",
+        "reference_number": "",
+        "description": "Rana sankar monitoring",
+        "debit_amount": 4000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000660037",
+        "date": "2026-02-27",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 2075.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000659011",
+        "date": "2026-02-27",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 1500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000650036",
+        "date": "2026-02-27",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 3547.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000647012",
+        "date": "2026-02-26",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 3000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000642012",
+        "date": "2026-02-26",
+        "reference_number": "",
+        "description": "",
+        "debit_amount": 40850.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000397001",
+        "date": "2026-02-17",
+        "reference_number": "",
+        "description": "RANA MONITORING",
+        "debit_amount": 2025.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001574012",
+        "date": "2026-03-23",
+        "reference_number": "",
+        "description": "NL OFFICE DESIGN ",
+        "debit_amount": 6000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001536023",
+        "date": "2026-02-27",
+        "reference_number": "",
+        "description": "NL OFFICE ELECTRICAL ITEMS",
+        "debit_amount": 11704.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001415013",
+        "date": "2026-06-17",
+        "reference_number": "",
+        "description": "O2 ROOM 1 WORK",
+        "debit_amount": 6000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001403012",
+        "date": "2026-06-17",
+        "reference_number": "",
+        "description": "O2 HALL ROOM 2D 3D DESIGN \n",
+        "debit_amount": 6000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000000678002",
+        "date": "2026-05-08",
+        "reference_number": "",
+        "description": "Led 20w",
+        "debit_amount": 190.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000000672001",
+        "date": "2026-05-07",
+        "reference_number": "",
+        "description": "Washroom design project",
+        "debit_amount": 2500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000000503043",
+        "date": "2026-04-25",
+        "reference_number": "",
+        "description": "wallmount",
+        "debit_amount": 2838.08,
+        "credit_amount": 0
+      }
+    ]
+  },
+  "Food and Brev E": {
+    "account_id": "3545384000001527002",
+    "entries": [
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001793001",
+        "date": "2026-07-14",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 800.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001705033",
+        "date": "2026-07-08",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 138.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001711016",
+        "date": "2026-07-08",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 110.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001714037",
+        "date": "2026-07-08",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 60.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001716006",
+        "date": "2026-07-08",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 100.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001674001",
+        "date": "2026-07-04",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 88.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001681001",
+        "date": "2026-07-04",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 172.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001593001",
+        "date": "2026-06-30",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 68.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001605027",
+        "date": "2026-06-30",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 76.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001630047",
+        "date": "2026-06-30",
+        "reference_number": "PAY ORDER",
+        "description": "LABOR 28TH",
+        "debit_amount": 84.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001630047",
+        "date": "2026-06-30",
+        "reference_number": "PAY ORDER",
+        "description": "LABOR 29TH",
+        "debit_amount": 176.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001630047",
+        "date": "2026-06-30",
+        "reference_number": "PAY ORDER",
+        "description": "adjust with previous bill",
+        "debit_amount": 2.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001553012",
+        "date": "2026-06-26",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 90.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001529016",
+        "date": "2026-06-24",
+        "reference_number": "pay order",
+        "description": "",
+        "debit_amount": 42.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001526001",
+        "date": "2026-06-23",
+        "reference_number": "PAY ORDER",
+        "description": "",
+        "debit_amount": 66.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001500031",
+        "date": "2026-06-22",
+        "reference_number": "",
+        "description": "Payment to Pratim  PETTY CASH\nLabour tiffin expense\n\n21.06.26\nTea- 13 - 78/-\nBiscuit -5- 10/-\n\n22.06.26\nTea- 5 - 30/-\nBiscuit -2- 4/-\n\nAdjusted 4 rupees WITH RS 6564",
+        "debit_amount": 118.0,
+        "credit_amount": 0
+      }
+    ]
+  }
+}</script>
+  <div class="page">
+    <nav class="site-nav" aria-label="Dashboards">
+      <a class="site-nav-link" href="journals_dashboard.html">Journals <span class="site-nav-home-tag">(Home)</span></a>
+      <span class="site-nav-divider"></span>
+      <span class="site-nav-group-label">Ledgers</span>
+      <a class="site-nav-link site-nav-sublink" href="#office-1" data-ledger-key="office-1">OFFICE 1 WASHROOM PROJECT</a>
+      <a class="site-nav-link site-nav-sublink" href="#office-2" data-ledger-key="office-2">OFFICE 2 PROJECT.</a>
+      <a class="site-nav-link site-nav-sublink" href="#food-and-brev-e" data-ledger-key="food-and-brev-e">Food and Brev E</a>
+    </nav>
+
+    <header class="topbar">
+      <div>
+        <h1>Zoho ERP Ledgers</h1>
+        <p class="ledger-subtitle" id="ledgerSubtitle"></p>
+      </div>
+    </header>
+
+    <div id="statusPanel"></div>
+
+    <div id="dashboardContent" hidden>
+      <section class="summary-bar" id="summaryBar" aria-label="Summary"></section>
+
+      <section class="filters-row" aria-label="Filters">
+        <div class="field field-search">
+          <label class="field-label" for="searchInput">Search</label>
+          <input id="searchInput" type="search" placeholder="Reference number or description…" autocomplete="off">
+        </div>
+        <div class="field">
+          <label class="field-label" for="dateFrom">Date range</label>
+          <div class="date-fields">
+            <input id="dateFrom" type="date" aria-label="From date">
+            <input id="dateTo" type="date" aria-label="To date">
+          </div>
+        </div>
+        <button id="clearFiltersBtn" class="btn btn-ghost" type="button">Clear filters</button>
+        <div class="filters-spacer"></div>
+        <span class="result-count" id="resultCount"></span>
+      </section>
+
+      <section class="table-card">
+        <div class="table-scroll">
+          <table id="ledgerTable">
+            <thead>
+              <tr>
+                <th class="sortable" data-sort="date" tabindex="0" role="button" aria-sort="none">Date</th>
+                <th class="sortable" data-sort="reference_number" tabindex="0" role="button" aria-sort="none">Reference Number</th>
+                <th class="sortable" data-sort="description" tabindex="0" role="button" aria-sort="none">Description</th>
+                <th class="sortable num" data-sort="debit_amount" tabindex="0" role="button" aria-sort="none">Debit</th>
+                <th class="sortable num" data-sort="credit_amount" tabindex="0" role="button" aria-sort="none">Credit</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+        <p class="empty-note" id="noResults" hidden>No entries for this ledger.</p>
+      </section>
+
+      <footer class="pagination" id="pagination">
+        <span id="pageInfo"></span>
+        <div class="page-buttons">
+          <button id="prevPage" class="btn btn-ghost" type="button">Prev</button>
+          <span class="page-current" id="pageCurrent"></span>
+          <button id="nextPage" class="btn btn-ghost" type="button">Next</button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  var PAGE_SIZE = 50;
+
+  /* Maps the hash slug used in nav links/URLs to the ledger name that keys
+     the embedded ledgers-data object (must match LEDGER_NAMES in
+     fetch_ledgers.py, including the trailing "." on OFFICE 2 PROJECT.). */
+  var LEDGER_KEYS = {
+    'office-1': 'OFFICE 1 WASHROOM PROJECT',
+    'office-2': 'OFFICE 2 PROJECT.',
+    'food-and-brev-e': 'Food and Brev E'
+  };
+  var DEFAULT_LEDGER_KEY = 'office-1';
+
+  var state = {
+    ledgersData: {},
+    ledgerKey: DEFAULT_LEDGER_KEY,
+    all: [],
+    filtered: [],
+    page: 1,
+    sortKey: 'date',
+    sortDir: 'desc',
+    search: '',
+    dateFrom: '',
+    dateTo: ''
+  };
+
+  var $ = function (sel) { return document.querySelector(sel); };
+
+  var statusPanel = $('#statusPanel');
+  var dashboardContent = $('#dashboardContent');
+  var ledgerSubtitle = $('#ledgerSubtitle');
+  var summaryBar = $('#summaryBar');
+  var searchInput = $('#searchInput');
+  var dateFromInput = $('#dateFrom');
+  var dateToInput = $('#dateTo');
+  var clearFiltersBtn = $('#clearFiltersBtn');
+  var resultCount = $('#resultCount');
+  var tableBody = $('#tableBody');
+  var noResults = $('#noResults');
+  var pageInfo = $('#pageInfo');
+  var pageCurrent = $('#pageCurrent');
+  var prevPageBtn = $('#prevPage');
+  var nextPageBtn = $('#nextPage');
+
+  var inrFormatter;
+  try {
+    inrFormatter = new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2
+    });
+  } catch (e) {
+    inrFormatter = null;
+  }
+
+  function formatCurrency(value) {
+    if (typeof value !== 'number' || isNaN(value)) return '—';
+    if (inrFormatter) return inrFormatter.format(value);
+    return '₹' + value.toFixed(2);
+  }
+
+  function formatAmountOrDash(value) {
+    return (typeof value === 'number' && value !== 0) ? formatCurrency(value) : '—';
+  }
+
+  function formatCount(n) {
+    return n.toLocaleString('en-IN');
+  }
+
+  function safeText(value) {
+    return (value === null || value === undefined || value === '') ? '' : String(value);
+  }
+
+  /* ---------------- Loading ---------------- */
+  /* Ledger data is embedded directly in this page as a JSON <script> block
+     (#ledgers-data) rather than fetched -- no fetch(), so this works from a
+     double-clicked file:// page with no local server. */
+
+  function showErrorPanel(message) {
+    dashboardContent.hidden = true;
+
+    var panel = document.createElement('div');
+    panel.className = 'status-panel error';
+
+    var h2 = document.createElement('h2');
+    var icon = document.createElement('span');
+    icon.className = 'error-icon';
+    icon.textContent = '⚠ ';
+    h2.appendChild(icon);
+    h2.appendChild(document.createTextNode('Could not load ledger data'));
+    panel.appendChild(h2);
+
+    var p = document.createElement('p');
+    p.style.marginBottom = '4px';
+    p.textContent = message;
+    panel.appendChild(p);
+
+    var p2 = document.createElement('p');
+    p2.style.marginBottom = '0';
+    var code = document.createElement('code');
+    code.textContent = 'python fetch_ledgers.py';
+    p2.appendChild(document.createTextNode('Run '));
+    p2.appendChild(code);
+    p2.appendChild(document.createTextNode(' to refresh the embedded data, then reload this page.'));
+    panel.appendChild(p2);
+
+    statusPanel.innerHTML = '';
+    statusPanel.appendChild(panel);
+    statusPanel.hidden = false;
+  }
+
+  function keyFromHash() {
+    var raw = (location.hash || '').replace(/^#/, '');
+    return LEDGER_KEYS.hasOwnProperty(raw) ? raw : DEFAULT_LEDGER_KEY;
+  }
+
+  function init() {
+    var dataEl = document.getElementById('ledgers-data');
+    var ledgersData;
+    try {
+      ledgersData = dataEl ? JSON.parse(dataEl.textContent) : undefined;
+    } catch (e) {
+      showErrorPanel('The embedded ledgers-data block could not be parsed as JSON.');
+      return;
+    }
+    if (!ledgersData || typeof ledgersData !== 'object' || Array.isArray(ledgersData)) {
+      showErrorPanel('No ledgers-data block was found on this page.');
+      return;
+    }
+
+    state.ledgersData = ledgersData;
+    statusPanel.hidden = true;
+    statusPanel.innerHTML = '';
+    dashboardContent.hidden = false;
+
+    selectLedger(keyFromHash());
+  }
+
+  /* ---------------- Ledger selection ---------------- */
+
+  /* Filters reset (not persist) on every ledger switch -- each ledger is a
+     different project's data, and carrying a date range or search term
+     across to an unrelated ledger would silently produce a misleading
+     "no entries" view rather than the fresh, full picture a nav click
+     implies. Sort order is a table-view preference, not data-specific, so
+     it deliberately does carry over. */
+  function selectLedger(key) {
+    state.ledgerKey = key;
+    var ledgerName = LEDGER_KEYS[key];
+    var ledger = state.ledgersData[ledgerName];
+    state.all = (ledger && Array.isArray(ledger.entries)) ? ledger.entries : [];
+    state.page = 1;
+    state.search = '';
+    state.dateFrom = '';
+    state.dateTo = '';
+    searchInput.value = '';
+    dateFromInput.value = '';
+    dateToInput.value = '';
+
+    ledgerSubtitle.textContent = ledgerName;
+    updateNavActive(key);
+    applyFiltersAndRender();
+  }
+
+  function updateNavActive(key) {
+    document.querySelectorAll('.site-nav-sublink').forEach(function (a) {
+      if (a.getAttribute('data-ledger-key') === key) {
+        a.classList.add('active');
+      } else {
+        a.classList.remove('active');
+      }
+    });
+  }
+
+  /* ---------------- Filtering ---------------- */
+
+  function matchesFilters(entry) {
+    if (state.search) {
+      var needle = state.search.toLowerCase();
+      var ref = safeText(entry.reference_number).toLowerCase();
+      var desc = safeText(entry.description).toLowerCase();
+      if (ref.indexOf(needle) === -1 && desc.indexOf(needle) === -1) return false;
+    }
+
+    if (state.dateFrom && state.dateTo) {
+      if (!entry.date || entry.date < state.dateFrom || entry.date > state.dateTo) return false;
+    } else if (state.dateFrom) {
+      if (entry.date !== state.dateFrom) return false;
+    } else if (state.dateTo) {
+      if (entry.date !== state.dateTo) return false;
+    }
+
+    return true;
+  }
+
+  /* ---------------- Sorting ---------------- */
+
+  function compareValues(a, b, key) {
+    if (key === 'debit_amount' || key === 'credit_amount') {
+      var na = typeof a[key] === 'number' ? a[key] : -Infinity;
+      var nb = typeof b[key] === 'number' ? b[key] : -Infinity;
+      return na - nb;
+    }
+    var sa = safeText(a[key]).toLowerCase();
+    var sb = safeText(b[key]).toLowerCase();
+    if (sa < sb) return -1;
+    if (sa > sb) return 1;
+    return 0;
+  }
+
+  function applyFiltersAndRender() {
+    var filtered = state.all.filter(matchesFilters);
+    filtered.sort(function (a, b) {
+      var cmp = compareValues(a, b, state.sortKey);
+      return state.sortDir === 'asc' ? cmp : -cmp;
+    });
+    state.filtered = filtered;
+
+    var maxPage = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    if (state.page > maxPage) state.page = maxPage;
+    if (state.page < 1) state.page = 1;
+
+    // Summary tiles reflect whatever the table currently shows, so they use
+    // the filtered set, same as renderTable/renderPagination.
+    renderSummary(filtered);
+    renderTable(filtered);
+    renderPagination(filtered);
+    renderResultCount(filtered);
+    renderSortHeaders();
+  }
+
+  /* ---------------- Rendering: summary ---------------- */
+
+  function renderSummary(entries) {
+    summaryBar.innerHTML = '';
+
+    var totalDebit = 0;
+    var totalCredit = 0;
+    for (var i = 0; i < entries.length; i++) {
+      var e = entries[i];
+      totalDebit += (typeof e.debit_amount === 'number' ? e.debit_amount : 0);
+      totalCredit += (typeof e.credit_amount === 'number' ? e.credit_amount : 0);
+    }
+
+    summaryBar.appendChild(makeStatTile('Total entries', formatCount(entries.length)));
+    summaryBar.appendChild(makeStatTile('Total debit', formatCurrency(totalDebit)));
+    summaryBar.appendChild(makeStatTile('Total credit', formatCurrency(totalCredit)));
+    summaryBar.appendChild(makeStatTile('Net (debit − credit)', formatCurrency(totalDebit - totalCredit)));
+  }
+
+  function makeStatTile(label, value) {
+    var tile = document.createElement('div');
+    tile.className = 'stat-tile';
+    var labelEl = document.createElement('p');
+    labelEl.className = 'stat-label';
+    labelEl.textContent = label;
+    var valueEl = document.createElement('p');
+    valueEl.className = 'stat-value';
+    valueEl.textContent = value;
+    tile.appendChild(labelEl);
+    tile.appendChild(valueEl);
+    return tile;
+  }
+
+  function renderResultCount(filtered) {
+    var totalAll = state.all.length;
+    if (filtered.length === totalAll) {
+      resultCount.textContent = formatCount(totalAll) + ' entry(ies)';
+    } else {
+      resultCount.textContent = formatCount(filtered.length) + ' of ' + formatCount(totalAll) + ' entry(ies)';
+    }
+  }
+
+  /* ---------------- Rendering: table ---------------- */
+
+  function renderSortHeaders() {
+    var headers = document.querySelectorAll('#ledgerTable thead th.sortable');
+    headers.forEach(function (th) {
+      var key = th.getAttribute('data-sort');
+      if (key === state.sortKey) {
+        th.setAttribute('aria-sort', state.sortDir === 'asc' ? 'ascending' : 'descending');
+      } else {
+        th.setAttribute('aria-sort', 'none');
+      }
+    });
+  }
+
+  function renderTable(filtered) {
+    tableBody.innerHTML = '';
+
+    if (filtered.length === 0) {
+      noResults.hidden = false;
+      return;
+    }
+    noResults.hidden = true;
+
+    var startIdx = (state.page - 1) * PAGE_SIZE;
+    var pageItems = filtered.slice(startIdx, startIdx + PAGE_SIZE);
+
+    var frag = document.createDocumentFragment();
+    pageItems.forEach(function (entry) {
+      frag.appendChild(buildRow(entry));
+    });
+    tableBody.appendChild(frag);
+  }
+
+  function buildRow(entry) {
+    var tr = document.createElement('tr');
+
+    var tdDate = document.createElement('td');
+    tdDate.textContent = safeText(entry.date) || '—';
+    if (!entry.date) tdDate.classList.add('muted-cell');
+    tr.appendChild(tdDate);
+
+    var tdRef = document.createElement('td');
+    var refText = safeText(entry.reference_number);
+    tdRef.textContent = refText || '—';
+    if (!refText) tdRef.classList.add('muted-cell');
+    tr.appendChild(tdRef);
+
+    var tdDesc = document.createElement('td');
+    var descText = safeText(entry.description);
+    tdDesc.textContent = descText || '—';
+    if (!descText) tdDesc.classList.add('muted-cell');
+    tr.appendChild(tdDesc);
+
+    var tdDebit = document.createElement('td');
+    tdDebit.className = 'num';
+    tdDebit.textContent = formatAmountOrDash(entry.debit_amount);
+    tr.appendChild(tdDebit);
+
+    var tdCredit = document.createElement('td');
+    tdCredit.className = 'num';
+    tdCredit.textContent = formatAmountOrDash(entry.credit_amount);
+    tr.appendChild(tdCredit);
+
+    return tr;
+  }
+
+  /* ---------------- Pagination ---------------- */
+
+  function renderPagination(filtered) {
+    var total = filtered.length;
+    var maxPage = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    var startIdx = total === 0 ? 0 : (state.page - 1) * PAGE_SIZE + 1;
+    var endIdx = Math.min(state.page * PAGE_SIZE, total);
+
+    pageInfo.textContent = total === 0
+      ? 'Showing 0 of 0'
+      : 'Showing ' + formatCount(startIdx) + '–' + formatCount(endIdx) + ' of ' + formatCount(total);
+    pageCurrent.textContent = 'Page ' + state.page + ' of ' + maxPage;
+
+    prevPageBtn.disabled = state.page <= 1;
+    nextPageBtn.disabled = state.page >= maxPage;
+  }
+
+  /* ---------------- Events ---------------- */
+
+  var searchDebounce = null;
+  searchInput.addEventListener('input', function () {
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(function () {
+      state.search = searchInput.value.trim();
+      state.page = 1;
+      applyFiltersAndRender();
+    }, 150);
+  });
+
+  dateFromInput.addEventListener('change', function () {
+    state.dateFrom = dateFromInput.value;
+    state.page = 1;
+    applyFiltersAndRender();
+  });
+
+  dateToInput.addEventListener('change', function () {
+    state.dateTo = dateToInput.value;
+    state.page = 1;
+    applyFiltersAndRender();
+  });
+
+  clearFiltersBtn.addEventListener('click', function () {
+    searchInput.value = '';
+    dateFromInput.value = '';
+    dateToInput.value = '';
+    state.search = '';
+    state.dateFrom = '';
+    state.dateTo = '';
+    state.page = 1;
+    applyFiltersAndRender();
+  });
+
+  document.querySelectorAll('#ledgerTable thead th.sortable').forEach(function (th) {
+    var key = th.getAttribute('data-sort');
+    function activate() {
+      if (state.sortKey === key) {
+        state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        state.sortKey = key;
+        state.sortDir = 'asc';
+      }
+      state.page = 1;
+      applyFiltersAndRender();
+    }
+    th.addEventListener('click', activate);
+    th.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Enter' || evt.key === ' ') {
+        evt.preventDefault();
+        activate();
+      }
+    });
+  });
+
+  prevPageBtn.addEventListener('click', function () {
+    if (state.page > 1) {
+      state.page -= 1;
+      renderTable(state.filtered);
+      renderPagination(state.filtered);
+    }
+  });
+
+  nextPageBtn.addEventListener('click', function () {
+    var maxPage = Math.max(1, Math.ceil(state.filtered.length / PAGE_SIZE));
+    if (state.page < maxPage) {
+      state.page += 1;
+      renderTable(state.filtered);
+      renderPagination(state.filtered);
+    }
+  });
+
+  window.addEventListener('hashchange', function () {
+    selectLedger(keyFromHash());
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>
