@@ -1,11 +1,16 @@
 name: Fetch Zoho Data
 
 # Manually/externally triggerable only -- no `schedule`/`cron` trigger here on
-# purpose. Scheduling is handled outside GitHub Actions, by Power Automate
-# calling this workflow's `workflow_dispatch` REST endpoint. See the project
-# README / the chat that generated this file for the exact endpoint URL and
-# the auth token Power Automate needs to call it.
+# purpose. Scheduling is handled outside GitHub Actions.
+#
+# Two trigger types, both intentional:
+#   - repository_dispatch (type "zoho-data-refresh"): the one Power Automate
+#     actually calls, via its "Create a repository dispatch event" action.
+#   - workflow_dispatch: manual fallback, runnable from the GitHub Actions UI
+#     ("Run workflow" button) without needing Power Automate at all.
 on:
+  repository_dispatch:
+    types: [zoho-data-refresh]
   workflow_dispatch:
 
 # Required so the final step can `git push` the refreshed data/dashboard
