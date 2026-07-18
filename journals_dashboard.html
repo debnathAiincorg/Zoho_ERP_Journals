@@ -207,7 +207,7 @@
   /* ---------- Filters row ---------- */
   .filters-row {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     gap: 10px;
     flex-wrap: wrap;
     background: var(--surface-1);
@@ -222,7 +222,7 @@
     flex-direction: column;
     gap: 4px;
   }
-  .filters-row label.field-label {
+  .filters-row .field-label {
     font-size: 0.6875rem;
     font-weight: 600;
     color: var(--text-muted);
@@ -238,11 +238,9 @@
     background: #ffffff;
     color: var(--text-primary);
   }
-  .filters-row .field-search { min-width: 240px; flex: 1 1 240px; }
-  #searchInput { width: 100%; }
   .filters-row .date-fields { display: flex; gap: 8px; }
+  .filters-row .date-field { display: flex; flex-direction: column; gap: 4px; }
   .filters-row .date-fields input { width: 150px; }
-  .filters-spacer { flex: 1 1 auto; }
   .result-count {
     font-size: 0.8125rem;
     color: var(--text-muted);
@@ -273,63 +271,10 @@
   }
   thead th.sortable { cursor: pointer; }
   thead th.sortable:hover { color: var(--text-secondary); }
-  thead th.col-expand, thead th.num { text-align: right; }
-  th.col-num-head { text-align: right; }
+  thead th.num { text-align: right; }
   td.num { text-align: right; font-variant-numeric: tabular-nums; }
   td { padding: 10px 14px; border-bottom: 1px solid var(--gridline); vertical-align: middle; }
-  tbody tr.data-row { cursor: pointer; }
-  tbody tr.data-row:hover { background: #eef4ed; }
-  tbody tr.data-row.expanded { background: #e3f0e0; }
-  td.col-expand { width: 32px; text-align: center; }
-  .expand-btn {
-    width: 22px; height: 22px;
-    border-radius: 6px;
-    border: 1px solid var(--border-strong);
-    background: #ffffff;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-    line-height: 1;
-    color: var(--text-secondary);
-    transition: transform 0.12s ease;
-  }
-  tr.expanded .expand-btn { transform: rotate(90deg); border-color: var(--accent); color: var(--accent); }
-  .journal-id-cell { font-variant-numeric: tabular-nums; color: var(--text-secondary); }
   .muted-cell { color: var(--text-muted); }
-
-  tr.expand-row td {
-    background: #f4faf3;
-    padding: 0 14px 16px 46px;
-    border-bottom: 1px solid var(--gridline);
-  }
-  .entries-wrap { padding-top: 4px; }
-  .entries-wrap h4 {
-    margin: 8px 0 6px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    color: var(--text-muted);
-  }
-  table.entries-table { min-width: 0; font-size: 0.8125rem; }
-  table.entries-table th { padding: 6px 10px; font-size: 0.6875rem; }
-  table.entries-table td { padding: 6px 10px; }
-  .entries-empty-note {
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    background: #ffffff;
-    border: 1px dashed var(--border-strong);
-    border-radius: 8px;
-    padding: 10px 12px;
-    margin: 8px 0;
-    max-width: 640px;
-  }
-  .entries-empty-note code {
-    background: #eeeeec;
-    border-radius: 4px;
-    padding: 1px 5px;
-  }
 
   .empty-note {
     padding: 32px 16px;
@@ -395,10 +340,8 @@
   @media (max-width: 720px) {
     .page { padding: 16px 14px 48px; }
     .filters-row { flex-direction: column; align-items: stretch; }
-    .filters-row .field-search { min-width: 0; flex: 1 1 auto; }
     .filters-row .date-fields { flex-direction: column; }
     .filters-row .date-fields input { width: 100%; }
-    .filters-spacer { display: none; }
   }
 </style>
 </head>
@@ -6071,10 +6014,6 @@
       <section class="summary-bar" id="summaryBar" aria-label="Summary"></section>
 
       <section class="filters-row" aria-label="Filters">
-        <div class="field field-search">
-          <label class="field-label" for="searchInput">Search</label>
-          <input id="searchInput" type="search" placeholder="Journal ID or reference number…" autocomplete="off">
-        </div>
         <div class="field">
           <label class="field-label" for="statusFilter">Status</label>
           <select id="statusFilter">
@@ -6084,14 +6023,19 @@
           </select>
         </div>
         <div class="field">
-          <label class="field-label" for="dateFrom">Date range</label>
+          <span class="field-label">Date range</span>
           <div class="date-fields">
-            <input id="dateFrom" type="date" aria-label="From date">
-            <input id="dateTo" type="date" aria-label="To date">
+            <div class="date-field">
+              <label class="field-label" for="dateFrom">From</label>
+              <input id="dateFrom" type="date" aria-label="From date">
+            </div>
+            <div class="date-field">
+              <label class="field-label" for="dateTo">To</label>
+              <input id="dateTo" type="date" aria-label="To date">
+            </div>
           </div>
         </div>
         <button id="clearFiltersBtn" class="btn btn-ghost" type="button">Clear filters</button>
-        <div class="filters-spacer"></div>
         <span class="result-count" id="resultCount"></span>
       </section>
 
@@ -6100,8 +6044,6 @@
           <table id="journalsTable">
             <thead>
               <tr>
-                <th class="col-expand"></th>
-                <th class="sortable" data-sort="journal_id" tabindex="0" role="button" aria-sort="none">Journal ID</th>
                 <th class="sortable" data-sort="date" tabindex="0" role="button" aria-sort="none">Date</th>
                 <th class="sortable" data-sort="reference_number" tabindex="0" role="button" aria-sort="none">Reference Number</th>
                 <th class="sortable" data-sort="status" tabindex="0" role="button" aria-sort="none">Status</th>
@@ -6145,8 +6087,6 @@
     page: 1,
     sortKey: 'date',
     sortDir: 'desc',
-    expanded: Object.create(null),
-    search: '',
     status: 'all',
     dateFrom: '',
     dateTo: ''
@@ -6157,7 +6097,6 @@
   var statusPanel = $('#statusPanel');
   var dashboardContent = $('#dashboardContent');
   var summaryBar = $('#summaryBar');
-  var searchInput = $('#searchInput');
   var statusFilter = $('#statusFilter');
   var dateFromInput = $('#dateFrom');
   var dateToInput = $('#dateTo');
@@ -6169,7 +6108,6 @@
   var pageCurrent = $('#pageCurrent');
   var prevPageBtn = $('#prevPage');
   var nextPageBtn = $('#nextPage');
-  var COLUMN_COUNT = 6;
 
   var inrFormatter;
   try {
@@ -6261,13 +6199,6 @@
 
   function matchesFilters(j) {
     if (state.status !== 'all' && j.status !== state.status) return false;
-
-    if (state.search) {
-      var needle = state.search.toLowerCase();
-      var ref = safeText(j.reference_number).toLowerCase();
-      var id = safeText(j.journal_id).toLowerCase();
-      if (ref.indexOf(needle) === -1 && id.indexOf(needle) === -1) return false;
-    }
 
     if (state.dateFrom && state.dateTo) {
       if (!j.date || j.date < state.dateFrom || j.date > state.dateTo) return false;
@@ -6404,35 +6335,13 @@
     var frag = document.createDocumentFragment();
     pageItems.forEach(function (journal) {
       frag.appendChild(buildRow(journal));
-      if (state.expanded[journal.journal_id]) {
-        frag.appendChild(buildExpandRow(journal));
-      }
     });
     tableBody.appendChild(frag);
   }
 
   function buildRow(journal) {
-    var id = journal.journal_id;
     var tr = document.createElement('tr');
     tr.className = 'data-row';
-    if (state.expanded[id]) tr.classList.add('expanded');
-    tr.setAttribute('data-id', String(id));
-
-    var tdExpand = document.createElement('td');
-    tdExpand.className = 'col-expand';
-    var btn = document.createElement('button');
-    btn.className = 'expand-btn';
-    btn.type = 'button';
-    btn.setAttribute('aria-expanded', state.expanded[id] ? 'true' : 'false');
-    btn.setAttribute('aria-label', 'Toggle account entries');
-    btn.textContent = '▶';
-    tdExpand.appendChild(btn);
-    tr.appendChild(tdExpand);
-
-    var tdId = document.createElement('td');
-    tdId.className = 'journal-id-cell';
-    tdId.textContent = safeText(journal.journal_id) || '—';
-    tr.appendChild(tdId);
 
     var tdDate = document.createElement('td');
     tdDate.textContent = safeText(journal.date) || '—';
@@ -6454,8 +6363,6 @@
     tdTotal.textContent = formatCurrency(journal.total);
     tr.appendChild(tdTotal);
 
-    tr.addEventListener('click', function () { toggleExpand(id); });
-
     return tr;
   }
 
@@ -6468,93 +6375,6 @@
     span.appendChild(dot);
     span.appendChild(document.createTextNode(meta ? meta.label : (status || 'Unknown')));
     return span;
-  }
-
-  function buildExpandRow(journal) {
-    var tr = document.createElement('tr');
-    tr.className = 'expand-row';
-    var td = document.createElement('td');
-    td.colSpan = COLUMN_COUNT;
-
-    var wrap = document.createElement('div');
-    wrap.className = 'entries-wrap';
-
-    var heading = document.createElement('h4');
-    heading.textContent = 'Account entries';
-    wrap.appendChild(heading);
-
-    var entries = Array.isArray(journal.account_entries) ? journal.account_entries : [];
-
-    if (entries.length === 0) {
-      var note = document.createElement('div');
-      note.className = 'entries-empty-note';
-      note.textContent = 'No line-item detail in this export. fetch_journals.py uses Zoho\'s list endpoint, which returns journal summaries only. ';
-      var code = document.createElement('code');
-      code.textContent = 'python fetch_journals.py --id ' + safeText(journal.journal_id);
-      note.appendChild(code);
-      note.appendChild(document.createTextNode(' fetches the single-journal detail, which includes account entries.'));
-      wrap.appendChild(note);
-    } else {
-      var table = document.createElement('table');
-      table.className = 'entries-table';
-      var thead = document.createElement('thead');
-      var headRow = document.createElement('tr');
-      ['Account', 'Debit', 'Credit'].forEach(function (label, idx) {
-        var th = document.createElement('th');
-        if (idx > 0) th.className = 'col-num-head';
-        th.textContent = label;
-        headRow.appendChild(th);
-      });
-      thead.appendChild(headRow);
-      table.appendChild(thead);
-
-      var tbody = document.createElement('tbody');
-      entries.forEach(function (entry) {
-        var row = document.createElement('tr');
-        var accountName = entry.account_name || entry.account || entry.name || '—';
-        var debit = pickAmount(entry, ['debit_amount', 'debit', 'debit_or_credit_amount']);
-        var credit = pickAmount(entry, ['credit_amount', 'credit']);
-
-        var tdA = document.createElement('td');
-        tdA.textContent = accountName;
-        row.appendChild(tdA);
-
-        var tdD = document.createElement('td');
-        tdD.className = 'num';
-        tdD.textContent = debit === null ? '—' : formatCurrency(debit);
-        row.appendChild(tdD);
-
-        var tdC = document.createElement('td');
-        tdC.className = 'num';
-        tdC.textContent = credit === null ? '—' : formatCurrency(credit);
-        row.appendChild(tdC);
-
-        tbody.appendChild(row);
-      });
-      table.appendChild(tbody);
-      wrap.appendChild(table);
-    }
-
-    td.appendChild(wrap);
-    tr.appendChild(td);
-    return tr;
-  }
-
-  function pickAmount(entry, keys) {
-    for (var i = 0; i < keys.length; i++) {
-      var v = entry[keys[i]];
-      if (typeof v === 'number') return v;
-    }
-    return null;
-  }
-
-  function toggleExpand(id) {
-    if (state.expanded[id]) {
-      delete state.expanded[id];
-    } else {
-      state.expanded[id] = true;
-    }
-    renderTable(state.filtered);
   }
 
   /* ---------------- Pagination ---------------- */
@@ -6576,16 +6396,6 @@
 
   /* ---------------- Events ---------------- */
 
-  var searchDebounce = null;
-  searchInput.addEventListener('input', function () {
-    clearTimeout(searchDebounce);
-    searchDebounce = setTimeout(function () {
-      state.search = searchInput.value.trim();
-      state.page = 1;
-      applyFiltersAndRender();
-    }, 150);
-  });
-
   statusFilter.addEventListener('change', function () {
     state.status = statusFilter.value;
     state.page = 1;
@@ -6605,11 +6415,9 @@
   });
 
   clearFiltersBtn.addEventListener('click', function () {
-    searchInput.value = '';
     statusFilter.value = 'all';
     dateFromInput.value = '';
     dateToInput.value = '';
-    state.search = '';
     state.status = 'all';
     state.dateFrom = '';
     state.dateTo = '';
