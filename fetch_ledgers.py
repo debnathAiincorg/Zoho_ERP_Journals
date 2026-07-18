@@ -22,6 +22,12 @@ account -- currently 401s with our OAuth scope and is not included. See the
 -- vendorpayments/customerpayments silently ignore the account_id filter and
 are structurally the wrong transaction type for this anyway.)
 
+Only fully-posted transactions are included: journals must have
+status="published", and bills must not be "draft" or "void" (see
+PUBLISHED_JOURNAL_STATUS / EXCLUDED_BILL_STATUSES below). Confirmed live
+against OFFICE 1 WASHROOM PROJECT for July 2026 -- 2 draft journals were
+inflating the debit total by their combined amount versus Zoho's own report.
+
 All 3 ledgers are written into one ledgers_output.json, keyed by ledger name,
 and the same data is used to refresh the embedded JSON block inside
 ledgers_dashboard.html (<script type="application/json" id="ledgers-data">),
@@ -63,6 +69,19 @@ LEDGER_NAMES = [
     "OFFICE 2 PROJECT.",  # trailing "." is part of the real account name
     "Food and Brev E",
 ]
+
+# Only fully-posted transactions affect a real account balance -- confirmed
+# live against OFFICE 1 WASHROOM PROJECT for July 2026: including 2 "draft"
+# journals overcounted debits by exactly their combined amount (Rs 2,500.00)
+# and entry count by exactly 2 versus Zoho's own Account Transactions report.
+# "published" is the only posted status seen in this org's data (the other
+# Zoho ERP statuses -- submitted/approved/rejected -- don't appear in
+# practice here); bills use a different status vocabulary, where "draft"
+# (not yet finalized) and "void" (cancelled) are the equivalent not-posted
+# states -- payment status like "open"/"paid" doesn't matter, since a bill
+# posts to its expense account on creation, not on payment.
+PUBLISHED_JOURNAL_STATUS = "published"
+EXCLUDED_BILL_STATUSES = {"draft", "void"}
 
 DEFAULT_OUT = "ledgers_output.json"
 LEDGERS_DASHBOARD_HTML = "ledgers_dashboard.html"
@@ -199,6 +218,12 @@ def main(argv=None) -> int:
         journal_summaries = [
             j for j in journal_summaries if _in_date_range(j.get("date"), args.date_from, args.date_to)
         ]
+        unposted_journal_count = sum(
+            1 for j in journal_summaries if j.get("status") != PUBLISHED_JOURNAL_STATUS
+        )
+        journal_summaries = [
+            j for j in journal_summaries if j.get("status") == PUBLISHED_JOURNAL_STATUS
+        ]
 
         entries = []
         detail_errors = 0
@@ -222,6 +247,12 @@ def main(argv=None) -> int:
         bill_summaries = [
             b for b in bill_summaries if _in_date_range(b.get("date"), args.date_from, args.date_to)
         ]
+        unposted_bill_count = sum(
+            1 for b in bill_summaries if b.get("status") in EXCLUDED_BILL_STATUSES
+        )
+        bill_summaries = [
+            b for b in bill_summaries if b.get("status") not in EXCLUDED_BILL_STATUSES
+        ]
         for summary in bill_summaries:
             try:
                 detail = get_bill(cfg, summary["bill_id"])
@@ -232,10 +263,17 @@ def main(argv=None) -> int:
             entries.extend(_line_entries_for_bill_account(detail, account_id))
 
         results[name] = {"account_id": account_id, "entries": entries}
+        exclusion_note = ""
+        if unposted_journal_count or unposted_bill_count:
+            exclusion_note = (
+                f" [excluded {unposted_journal_count} non-published journal(s), "
+                f"{unposted_bill_count} draft/void bill(s) -- not posted to the ledger]"
+            )
         print(
             f"{name}: account_id={account_id}, {len(journal_summaries)} journal(s) + "
             f"{len(bill_summaries)} bill(s), {len(entries)} line entry(ies)"
             + (f" ({detail_errors} detail fetch error(s))" if detail_errors else "")
+            + exclusion_note
         )
 
     with open(args.out, "w", encoding="utf-8") as f:
