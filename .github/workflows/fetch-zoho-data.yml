@@ -1,0 +1,122 @@
+name: Fetch Zoho Data
+
+# Manually/externally triggerable only -- no `schedule`/`cron` trigger here on
+# purpose. Scheduling is handled outside GitHub Actions, by Power Automate
+# calling this workflow's `workflow_dispatch` REST endpoint. See the project
+# README / the chat that generated this file for the exact endpoint URL and
+# the auth token Power Automate needs to call it.
+on:
+  workflow_dispatch:
+
+# Required so the final step can `git push` the refreshed data/dashboard
+# files back to this repo using the automatically-provided GITHUB_TOKEN --
+# without this, the default token is often read-only and the push will fail.
+permissions:
+  contents: write
+
+jobs:
+  fetch-and-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # ------------------------------------------------------------------
+      # Reconstruct .env from GitHub Secrets (never committed -- .env is
+      # gitignored, and this step only ever writes it into the ephemeral
+      # runner's filesystem, which is discarded when the job ends).
+      #
+      # IMPORTANT AUTH CONSTRAINT: this project's OAuth flow needs a
+      # one-time, human-driven grant-token exchange (token_exchange.py) to
+      # obtain the *first* access/refresh token pair -- that step requires
+      # a live person to generate a grant token in the Zoho API console
+      # (it expires in ~10 minutes) and cannot run unattended. This
+      # workflow therefore NEVER runs token_exchange.py. Instead, it seeds
+      # .env directly with an already-valid ZOHO_REFRESH_TOKEN (obtained
+      # manually, once, ahead of time) and lets zoho_client.py's existing
+      # auto-refresh logic (get_valid_access_token) mint a fresh access
+      # token on first use. ZOHO_ACCESS_TOKEN/ZOHO_TOKEN_EXPIRES_AT can be
+      # blank/0 -- that just forces an immediate refresh on the first API
+      # call of the run.
+      # ------------------------------------------------------------------
+      - name: Reconstruct .env from GitHub Secrets
+        run: |
+          cat <<EOF > .env
+          ZOHO_CLIENT_ID=${{ secrets.ZOHO_CLIENT_ID }}
+          ZOHO_CLIENT_SECRET=${{ secrets.ZOHO_CLIENT_SECRET }}
+          ZOHO_ORGANIZATION_ID=${{ secrets.ZOHO_ORGANIZATION_ID }}
+          ZOHO_ACCOUNTS_URL=${{ secrets.ZOHO_ACCOUNTS_URL }}
+          ZOHO_API_DOMAIN=${{ secrets.ZOHO_API_DOMAIN }}
+          ZOHO_REDIRECT_URI=${{ secrets.ZOHO_REDIRECT_URI }}
+          ZOHO_REFRESH_TOKEN=${{ secrets.ZOHO_REFRESH_TOKEN }}
+          ZOHO_ACCESS_TOKEN=${{ secrets.ZOHO_ACCESS_TOKEN }}
+          ZOHO_TOKEN_EXPIRES_AT=${{ secrets.ZOHO_TOKEN_EXPIRES_AT }}
+          EOF
+
+      - name: Fetch journals (updates journals_output.json + journals_dashboard.html)
+        run: python fetch_journals.py
+
+      - name: Fetch ledgers (updates ledgers_output.json + ledgers_dashboard.html)
+        run: python fetch_ledgers.py
+
+      # ------------------------------------------------------------------
+      # KNOWN OPERATIONAL CONSIDERATION -- refresh token rotation:
+      # zoho_client.py's save_tokens() may update ZOHO_ACCESS_TOKEN,
+      # ZOHO_REFRESH_TOKEN, and ZOHO_TOKEN_EXPIRES_AT in the runtime .env
+      # above as part of the auto-refresh that just happened. Since .env is
+      # never committed, those updated values are thrown away when this job
+      # ends -- the *next* run always starts from whatever ZOHO_REFRESH_TOKEN
+      # is currently stored in GitHub Secrets, not the one this run may have
+      # just rotated to. Zoho's refresh tokens are normally long-lived and
+      # reusable (only the access token is expected to rotate on refresh),
+      # so this is not expected to cause failures in practice. But if Zoho
+      # ever DOES rotate the refresh token itself, the Secret will silently
+      # go stale and every subsequent run will start failing auth -- at
+      # that point the Secret must be updated manually with a fresh
+      # ZOHO_REFRESH_TOKEN. This is a deliberate tradeoff of this
+      # unattended-run design, not a bug to silently work around.
+      # ------------------------------------------------------------------
+
+      # Only the 4 generated data/dashboard files are ever candidates for
+      # commit -- .env is excluded explicitly (and is gitignored anyway).
+      - name: Check for changes to tracked data/dashboard files
+        id: git-check
+        run: |
+          git status --porcelain -- journals_output.json ledgers_output.json journals_dashboard.html ledgers_dashboard.html > /tmp/changed_files.txt
+          if [ -s /tmp/changed_files.txt ]; then
+            echo "Changes detected:"
+            cat /tmp/changed_files.txt
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No changes detected."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push updated data
+        if: steps.git-check.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add journals_output.json ledgers_output.json journals_dashboard.html ledgers_dashboard.html
+          git commit -m "Automated Zoho data refresh -- $(date -u +'%Y-%m-%d %H:%M UTC')"
+          # Guard against a concurrent push having landed on main since this
+          # job's checkout; rebase onto the latest tip before pushing rather
+          # than failing outright on a non-fast-forward push.
+          git pull --rebase origin main
+          git push origin main
+
+      # Explicit no-op branch (rather than letting the job just end after a
+      # skipped step) so the workflow's intent -- "nothing changed, that's a
+      # normal successful outcome, not a failure" -- is visible in the logs.
+      - name: No changes to commit
+        if: steps.git-check.outputs.changed == 'false'
+        run: echo "No changes in journals_output.json, ledgers_output.json, journals_dashboard.html, or ledgers_dashboard.html -- nothing to commit."
