@@ -8,6 +8,15 @@ name: Fetch Zoho Data
 #     actually calls, via its "Create a repository dispatch event" action.
 #   - workflow_dispatch: manual fallback, runnable from the GitHub Actions UI
 #     ("Run workflow" button) without needing Power Automate at all.
+#
+# End-to-end "does the page update itself" chain, since this workflow is
+# only step 1 of it: this job pushes the refreshed dashboard HTML to `main`
+# -> GitHub Pages auto-redeploys on every push to `main`, no extra step
+# needed here -> journals_dashboard.html/ledgers_dashboard.html each carry a
+# <meta http-equiv="refresh" content="600"> tag so a browser tab left open
+# reloads itself every 10 minutes and picks up the new deploy without a
+# manual refresh. If the page still looks stale, check that step, not this
+# workflow.
 on:
   repository_dispatch:
     types: [zoho-data-refresh]

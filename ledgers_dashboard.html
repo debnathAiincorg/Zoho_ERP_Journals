@@ -16,6 +16,13 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+<!-- Auto-refresh so anyone with this page open picks up the latest data
+     from the next fetch-zoho-data.yml run without a manual reload -- 600s
+     matches GitHub Pages' own max-age above, so this is the earliest point
+     a reload is guaranteed to see fresh content anyway. Plain meta-refresh
+     (not JS/fetch) so this still works offline as a double-clicked file --
+     it just harmlessly reloads the same local file. -->
+<meta http-equiv="refresh" content="600">
 <title>Zoho ERP Ledgers Dashboard</title>
 <style>
   :root {
