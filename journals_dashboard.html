@@ -128,6 +128,11 @@
     font-weight: 700;
     margin: 0;
   }
+  .last-updated-note {
+    margin: 4px 0 0;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
 
   .btn {
     appearance: none;
@@ -7508,6 +7513,7 @@
     "description": "Washroom Renovation \n\n 17.06.26\nLabour - 650/-\nRana da (monitor)- 1000/-\n\n18.06.26\nRana da for (monitor)- 500/-\n\n19.06.26\nLabour - 850/-\n \n*Payment to Rana da account"
   }
 ]</script>
+  <script type="application/json" id="last-updated">"2026-08-06T05:37:00Z"</script>
   <div class="page">
     <nav class="site-nav" aria-label="Dashboards">
       <a class="site-nav-link active" href="journals_dashboard.html">Journals <span class="site-nav-home-tag">(Home)</span></a>
@@ -7521,6 +7527,7 @@
     <header class="topbar">
       <div>
         <h1>Zoho ERP Journals</h1>
+        <p class="last-updated-note" id="lastUpdated"></p>
       </div>
     </header>
 
@@ -7614,6 +7621,7 @@
   var statusPanel = $('#statusPanel');
   var dashboardContent = $('#dashboardContent');
   var summaryBar = $('#summaryBar');
+  var lastUpdatedEl = $('#lastUpdated');
   var statusFilter = $('#statusFilter');
   var dateFromInput = $('#dateFrom');
   var dateToInput = $('#dateTo');
@@ -7708,6 +7716,7 @@
     statusPanel.hidden = true;
     statusPanel.innerHTML = '';
     dashboardContent.hidden = false;
+    lastUpdatedEl.textContent = 'Last updated: ' + formatLastUpdated();
 
     applyFiltersAndRender();
   }
@@ -7767,9 +7776,34 @@
   var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'];
 
+  // The date shown on the page comes from fetch_journals.py, not the
+  // viewer's browser clock -- it stamps the current time into the
+  // #last-updated JSON block (id="last-updated") every time it runs, so
+  // this always reflects when the data was actually last fetched, not
+  // just when someone happened to open the page.
+  function getLastUpdated() {
+    var el = document.getElementById('last-updated');
+    var iso = null;
+    try {
+      iso = el ? JSON.parse(el.textContent) : null;
+    } catch (e) {
+      iso = null;
+    }
+    var d = iso ? new Date(iso) : null;
+    return (d && !isNaN(d.getTime())) ? d : new Date();
+  }
+
   function formatCurrentDate() {
-    var now = new Date();
-    return now.getDate() + ' ' + MONTH_NAMES[now.getMonth()];
+    var d = getLastUpdated();
+    return d.getDate() + ' ' + MONTH_NAMES[d.getMonth()];
+  }
+
+  function formatLastUpdated() {
+    var d = getLastUpdated();
+    var hours = String(d.getHours()).padStart(2, '0');
+    var minutes = String(d.getMinutes()).padStart(2, '0');
+    return d.getDate() + ' ' + MONTH_NAMES[d.getMonth()] + ' ' + d.getFullYear() +
+      ', ' + hours + ':' + minutes;
   }
 
   function renderSummary(journals) {

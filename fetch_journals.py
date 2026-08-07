@@ -34,6 +34,7 @@ import argparse
 import json
 import re
 import sys
+from datetime import datetime, timezone
 
 from zoho_client import (
     AuthError,
@@ -50,6 +51,10 @@ DEFAULT_OUT = "journals_output.json"
 DASHBOARD_HTML = "journals_dashboard.html"
 DATA_BLOCK_RE = re.compile(
     r'(<script type="application/json" id="journals-data">)(.*?)(</script>)',
+    re.DOTALL,
+)
+LAST_UPDATED_RE = re.compile(
+    r'(<script type="application/json" id="last-updated">)(.*?)(</script>)',
     re.DOTALL,
 )
 
@@ -121,6 +126,32 @@ def _update_dashboard_html(records: list, path: str) -> bool:
     return True
 
 
+def _update_last_updated_html(path: str) -> bool:
+    """Stamp the current UTC time into journals_dashboard.html's embedded
+    <script type="application/json" id="last-updated"> block, so the
+    "Current date" KPI and the "Last updated" note reflect when this script
+    actually ran, not just when a viewer's browser happened to load the
+    page. Returns True if the block was found and updated, False otherwise.
+    """
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            html = f.read()
+    except FileNotFoundError:
+        return False
+
+    if not LAST_UPDATED_RE.search(html):
+        return False
+
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    new_html = LAST_UPDATED_RE.sub(
+        lambda m: m.group(1) + json.dumps(timestamp) + m.group(3), html, count=1
+    )
+
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(new_html)
+    return True
+
+
 def main(argv=None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -176,6 +207,8 @@ def main(argv=None) -> int:
 
             if _update_dashboard_html(result, DASHBOARD_HTML):
                 print(f"Updated embedded data in {DASHBOARD_HTML}")
+                if _update_last_updated_html(DASHBOARD_HTML):
+                    print(f"Stamped last-updated timestamp in {DASHBOARD_HTML}")
                 print()
                 print(f"{DASHBOARD_HTML} updated with this run's data -- just open it "
                       "directly, no server needed.")
