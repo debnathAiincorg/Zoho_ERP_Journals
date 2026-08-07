@@ -7781,6 +7781,8 @@
   // #last-updated JSON block (id="last-updated") every time it runs, so
   // this always reflects when the data was actually last fetched, not
   // just when someone happened to open the page.
+  var IST_OFFSET_MINUTES = 5 * 60 + 30; // IST = UTC+5:30, fixed (no DST)
+
   function getLastUpdated() {
     var el = document.getElementById('last-updated');
     var iso = null;
@@ -7790,20 +7792,26 @@
       iso = null;
     }
     var d = iso ? new Date(iso) : null;
-    return (d && !isNaN(d.getTime())) ? d : new Date();
+    d = (d && !isNaN(d.getTime())) ? d : new Date();
+    // Shift the instant by the IST offset, then read it back with the UTC
+    // getters below -- that yields IST wall-clock time regardless of the
+    // viewer's own OS/browser timezone, instead of getDate()/getHours(),
+    // which silently render in whatever timezone the viewer happens to be
+    // in.
+    return new Date(d.getTime() + IST_OFFSET_MINUTES * 60000);
   }
 
   function formatCurrentDate() {
     var d = getLastUpdated();
-    return d.getDate() + ' ' + MONTH_NAMES[d.getMonth()];
+    return d.getUTCDate() + ' ' + MONTH_NAMES[d.getUTCMonth()];
   }
 
   function formatLastUpdated() {
     var d = getLastUpdated();
-    var hours = String(d.getHours()).padStart(2, '0');
-    var minutes = String(d.getMinutes()).padStart(2, '0');
-    return d.getDate() + ' ' + MONTH_NAMES[d.getMonth()] + ' ' + d.getFullYear() +
-      ', ' + hours + ':' + minutes;
+    var hours = String(d.getUTCHours()).padStart(2, '0');
+    var minutes = String(d.getUTCMinutes()).padStart(2, '0');
+    return d.getUTCDate() + ' ' + MONTH_NAMES[d.getUTCMonth()] + ' ' + d.getUTCFullYear() +
+      ', ' + hours + ':' + minutes + ' IST';
   }
 
   function renderSummary(journals) {
