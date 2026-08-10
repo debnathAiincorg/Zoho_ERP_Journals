@@ -22,6 +22,15 @@
       },
       {
         "source_type": "journal",
+        "source_id": "3545384000002343023",
+        "date": "2026-08-08",
+        "reference_number": "PAY ORDER",
+        "description": "PAID TO URBAN CLUB FOR OFFICE WASHROOM ELECTRICAL WORK PB",
+        "debit_amount": 467.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
         "source_id": "3545384000002272001",
         "date": "2026-08-07",
         "reference_number": "PAY ORDER",
