@@ -1332,15 +1332,6 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000001746009",
-        "date": "2026-07-09",
-        "reference_number": "PAY ORDER",
-        "description": "Payment to Rana da\n\n08.07.26\nWashroom Renovation \n\nMistree- 850/-\nLabour- 650/-",
-        "debit_amount": 1500.0,
-        "credit_amount": 0
-      },
-      {
-        "source_type": "journal",
         "source_id": "3545384000001744009",
         "date": "2026-07-09",
         "reference_number": "PAY ORDER",
@@ -1354,6 +1345,15 @@
         "date": "2026-07-09",
         "reference_number": "PAY ORDER",
         "description": "Payment to Suraj da UPI\n\n08.07.26\nO2 Carpenter work \nMistree-2- 750*2=1500/-",
+        "debit_amount": 1500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001746009",
+        "date": "2026-07-09",
+        "reference_number": "PAY ORDER",
+        "description": "Payment to Rana da\n\n08.07.26\nWashroom Renovation \n\nMistree- 850/-\nLabour- 650/-",
         "debit_amount": 1500.0,
         "credit_amount": 0
       },
