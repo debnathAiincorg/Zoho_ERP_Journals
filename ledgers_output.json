@@ -4,15 +4,6 @@
     "entries": [
       {
         "source_type": "journal",
-        "source_id": "3545384000002420001",
-        "date": "2026-08-18",
-        "reference_number": "PAY ORDER",
-        "description": "Payment to Suparna di \n\n14.08.26\nWashroom outside & loft design \nTotal amount- 4000/-\nAdvance amount -2000/-",
-        "debit_amount": 0,
-        "credit_amount": 2000.0
-      },
-      {
-        "source_type": "journal",
         "source_id": "3545384000002413001",
         "date": "2026-08-13",
         "reference_number": "PAY ORDER",
@@ -2021,6 +2012,15 @@
         "reference_number": "",
         "description": "\" WDL TFR   UPI/DR/604781544884/BABU BOA/CBIN/11476982\n @c/NL e   0097690162095 AT 08077 PALBAZAR   (KOLKATA)\"\n",
         "debit_amount": 2632.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000002529022",
+        "date": "2026-08-18",
+        "reference_number": "",
+        "description": "washroom outside and loft design",
+        "debit_amount": 2000.0,
         "credit_amount": 0
       },
       {
