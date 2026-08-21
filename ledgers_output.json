@@ -4,10 +4,19 @@
     "entries": [
       {
         "source_type": "journal",
-        "source_id": "3545384000002569001",
+        "source_id": "3545384000002567001",
         "date": "2026-08-21",
         "reference_number": "PAY ORDER",
-        "description": "Create a pay-order\nRana da\n\n20.08.26\nO1 Washroom Renovation \nMaterial purchase cement - 15/-",
+        "description": "Create a pay-order \nPayment to UPI \nRana da\n\n20.08.26\nO1 Washroom Renovation \n\nReservoir cleaning & washroom cleaning (Monitoring)- 1000/-",
+        "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000002576027",
+        "date": "2026-08-21",
+        "reference_number": "",
+        "description": "MATERIAL ",
         "debit_amount": 15.0,
         "credit_amount": 0
       },
