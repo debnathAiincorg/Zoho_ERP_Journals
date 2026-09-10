@@ -11,12 +11,21 @@ name: Fetch Zoho Data
 #
 # End-to-end "does the page update itself" chain, since this workflow is
 # only step 1 of it: this job pushes the refreshed dashboard HTML to `main`
-# -> GitHub Pages auto-redeploys on every push to `main`, no extra step
-# needed here -> journals_dashboard.html/ledgers_dashboard.html each carry a
-# <meta http-equiv="refresh" content="600"> tag so a browser tab left open
-# reloads itself every 10 minutes and picks up the new deploy without a
-# manual refresh. If the page still looks stale, check that step, not this
-# workflow.
+# -> Vercel auto-redeploys on every push to `main` (its Git integration; no
+# deploy step is needed here, and no Vercel token/secret is used by this
+# workflow) -> each dashboard polls its own public/<name>-version.json every
+# 60s and, when that fingerprint changes, either reloads itself (only if the
+# viewer is idle on an unmodified view) or offers a "New data available"
+# banner. Cache-Control headers come from vercel.json, so a reload can never
+# be served a stale copy.
+#
+# Deploying to GitHub Pages as well would mean two live copies of the same
+# dashboards drifting apart, so Pages is deliberately NOT used. If it is
+# still enabled, turn it off in Settings -> Pages (it is a repo setting, not
+# a file in this repo).
+#
+# If the deployed page looks stale, check the Vercel deployment for this
+# commit and the poll in the browser console -- not this workflow.
 on:
   repository_dispatch:
     types: [zoho-data-refresh]
@@ -100,12 +109,15 @@ jobs:
       # unattended-run design, not a bug to silently work around.
       # ------------------------------------------------------------------
 
-      # Only the 4 generated data/dashboard files are ever candidates for
+      # Only the 6 generated data/dashboard files are ever candidates for
       # commit -- .env is excluded explicitly (and is gitignored anyway).
+      # public/*-version.json are the fingerprints open tabs poll; they change
+      # only when that dashboard's data actually changed, unlike the dashboard
+      # HTML itself, which always differs because of its last-updated stamp.
       - name: Check for changes to tracked data/dashboard files
         id: git-check
         run: |
-          git status --porcelain -- journals_output.json ledgers_output.json journals_dashboard.html ledgers_dashboard.html > /tmp/changed_files.txt
+          git status --porcelain -- journals_output.json ledgers_output.json public/journals_dashboard.html public/ledgers_dashboard.html public/journals-version.json public/ledgers-version.json > /tmp/changed_files.txt
           if [ -s /tmp/changed_files.txt ]; then
             echo "Changes detected:"
             cat /tmp/changed_files.txt
@@ -120,7 +132,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add journals_output.json ledgers_output.json journals_dashboard.html ledgers_dashboard.html
+          git add journals_output.json ledgers_output.json public/journals_dashboard.html public/ledgers_dashboard.html public/journals-version.json public/ledgers-version.json
           git commit -m "Automated Zoho data refresh -- $(date -u +'%Y-%m-%d %H:%M UTC')"
           # Guard against a concurrent push having landed on main since this
           # job's checkout; rebase onto the latest tip before pushing rather
@@ -133,4 +145,4 @@ jobs:
       # normal successful outcome, not a failure" -- is visible in the logs.
       - name: No changes to commit
         if: steps.git-check.outputs.changed == 'false'
-        run: echo "No changes in journals_output.json, ledgers_output.json, journals_dashboard.html, or ledgers_dashboard.html -- nothing to commit."
+        run: echo "No changes in the output JSON, dashboard HTML, or version files -- nothing to commit, so Vercel is already serving current data."

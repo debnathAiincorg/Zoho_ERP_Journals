@@ -1,0 +1,18 @@
+# Only public/ is ever served (vercel.json -> outputDirectory). Excluding
+# everything else from the upload as well is defence in depth: even if the
+# output directory were ever misconfigured to the repo root, none of these
+# files would exist on the deployment to be served.
+#
+# Nothing here is needed to build the site -- there is no build step at all,
+# just static HTML that the fetch scripts have already written data into.
+.env
+.env.*
+*.py
+__pycache__/
+requirements.txt
+docs/
+*_output.json
+journal_*.json
+.github/
+.vscode/
+README.md

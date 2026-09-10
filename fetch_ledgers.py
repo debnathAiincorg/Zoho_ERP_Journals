@@ -30,9 +30,9 @@ inflating the debit total by their combined amount versus Zoho's own report.
 
 All 3 ledgers are written into one ledgers_output.json, keyed by ledger name,
 and the same data is used to refresh the embedded JSON block inside
-ledgers_dashboard.html (<script type="application/json" id="ledgers-data">),
-so ledgers_dashboard.html stays self-contained and works when double-clicked
-from file:// -- no local server needed:
+public/ledgers_dashboard.html (<script type="application/json"
+id="ledgers-data">), so the dashboard stays self-contained and works when
+double-clicked from file:// -- no local server needed:
 
     python fetch_ledgers.py
     python fetch_ledgers.py --date-from 2026-01-01 --date-to 2026-06-30
@@ -45,6 +45,7 @@ grant-token regeneration with an added scope -- see the Chart of Accounts
 section in zoho_client.py.)
 """
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -84,7 +85,14 @@ PUBLISHED_JOURNAL_STATUS = "published"
 EXCLUDED_BILL_STATUSES = {"draft", "void"}
 
 DEFAULT_OUT = "ledgers_output.json"
-LEDGERS_DASHBOARD_HTML = "ledgers_dashboard.html"
+# Under public/ because that is the only directory Vercel serves (see
+# vercel.json's outputDirectory). Relative to the CWD the script runs from,
+# i.e. the repo root, both locally and in the GitHub Actions workflow.
+LEDGERS_DASHBOARD_HTML = "public/ledgers_dashboard.html"
+# Fingerprint sidecar polled by open tabs of this dashboard -- see the note on
+# VERSION_JSON in fetch_journals.py. Each script owns exactly one of these
+# files, so a ledgers refresh never prompts a reload on the journals page.
+VERSION_JSON = "public/ledgers-version.json"
 DATA_BLOCK_RE = re.compile(
     r'(<script type="application/json" id="ledgers-data">)(.*?)(</script>)',
     re.DOTALL,
@@ -194,6 +202,19 @@ def _update_dashboard_html(results: dict, path: str) -> bool:
     return True
 
 
+def _write_version_json(path: str, results: dict) -> None:
+    """Write the fingerprint sidecar that open dashboard tabs poll.
+
+    sort_keys makes the digest depend only on the data itself, not on Zoho's
+    key ordering, so an unchanged dataset always fingerprints identically.
+    """
+    digest = hashlib.sha256(
+        json.dumps(results, sort_keys=True).encode("utf-8")
+    ).hexdigest()[:16]
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump({"data_version": digest}, f)
+
+
 def main(argv=None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -298,6 +319,8 @@ def main(argv=None) -> int:
 
     if _update_dashboard_html(results, LEDGERS_DASHBOARD_HTML):
         print(f"Updated embedded data in {LEDGERS_DASHBOARD_HTML}")
+        _write_version_json(VERSION_JSON, results)
+        print(f"Wrote {VERSION_JSON} (polled by open dashboard tabs)")
         print()
         print(f"{LEDGERS_DASHBOARD_HTML} updated with this run's data -- just open it "
               "directly, no server needed.")
