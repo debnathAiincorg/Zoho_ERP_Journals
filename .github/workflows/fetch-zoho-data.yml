@@ -28,6 +28,26 @@ on:
 permissions:
   contents: write
 
+# Never let two refreshes run at once. A full refresh takes ~9 minutes (200+
+# per-record detail calls, paced by MIN_REQUEST_INTERVAL in zoho_client.py),
+# which is longer than the gap between dispatches can be -- so runs used to
+# overlap. When they did, the second run checked out main, spent minutes
+# fetching, and only then discovered the first run had pushed a commit
+# rewriting the very same embedded JSON blocks. `git pull --rebase` in the
+# push step cannot auto-merge two independent whole-block rewrites, so it
+# conflicted and the run failed. This happened on 2026-09-10: run 11:22:44Z
+# pushed at 11:31:49Z, and run 11:30:03Z died at its push step at 11:39:11Z.
+#
+# cancel-in-progress is false because a refresh that is already talking to
+# Zoho should be allowed to finish and commit. The queued run then starts
+# from the finished run's commit, so its own push is a plain fast-forward.
+# If a third dispatch arrives while one is already queued it replaces the
+# queued one, which loses nothing: every run does a complete refresh, so the
+# newest run alone produces exactly the same result.
+concurrency:
+  group: fetch-zoho-data
+  cancel-in-progress: false
+
 jobs:
   fetch-and-commit:
     runs-on: ubuntu-latest
