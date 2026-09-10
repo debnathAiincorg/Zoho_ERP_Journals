@@ -3,16 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- No http-equiv cache tags and no meta-refresh here, deliberately. Both
-     were workarounds for GitHub Pages, which pinned every file to
-     `Cache-Control: max-age=600` and gave no way to override it; browsers
-     largely ignore http-equiv cache tags anyway, since those only mean
-     anything as real response headers. Vercel does let us set the real
-     header, so vercel.json sends `max-age=0, must-revalidate` and a reload
-     can no longer be served a stale copy. Picking up a redeploy is handled
-     by the "New-data polling" block at the end of this file, which -- unlike
-     a blind 10-minute meta-refresh -- will not throw away the filters, sort
-     order, and page the viewer had set. -->
+<!-- GitHub Pages serves this file with `Cache-Control: max-age=600` (its
+     fixed default -- static hosting, no per-repo header control) and
+     browsers are standards-compliant in reusing a cached copy for up to
+     10 minutes without revalidating. These http-equiv meta tags ask the
+     browser to skip that caching; be aware Chrome and most modern
+     browsers largely IGNORE http-equiv Cache-Control/Pragma/Expires for
+     actual HTTP caching decisions (those only apply to real response
+     headers, which GitHub Pages doesn't let us set). This is a
+     best-effort mitigation, not a guarantee -- a hard refresh
+     (Ctrl+Shift+R) always bypasses the cache regardless. -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<!-- Auto-refresh so anyone with this page open picks up the latest data
+     from the next fetch-zoho-data.yml run without a manual reload -- 600s
+     matches GitHub Pages' own max-age above, so this is the earliest point
+     a reload is guaranteed to see fresh content anyway. Plain meta-refresh
+     (not JS/fetch) so this still works offline as a double-clicked file --
+     it just harmlessly reloads the same local file. -->
+<meta http-equiv="refresh" content="600">
 <title>Zoho ERP Journals Dashboard</title>
 <style>
   :root {
@@ -350,31 +360,10 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* ---------- New-data banner ---------- */
-  .update-banner {
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
-    z-index: 50;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    background: var(--surface-1);
-    border: 1px solid var(--border-strong);
-    box-shadow: 0 4px 14px rgba(16,36,26,0.20);
-    border-radius: 10px;
-    padding: 11px 13px;
-    font-size: 0.875rem;
-    color: var(--text-primary);
-  }
-  .update-banner .btn { padding: 6px 12px; font-size: 0.8125rem; }
-
   [hidden] { display: none !important; }
 
   @media (max-width: 720px) {
     .page { padding: 16px 14px 48px; }
-    .update-banner { left: 14px; right: 14px; bottom: 14px; }
     .filters-row { flex-direction: column; align-items: stretch; }
     .filters-row .date-fields { flex-direction: column; }
     .filters-row .date-fields input { width: 100%; }
@@ -9997,111 +9986,6 @@
       renderPagination(state.filtered);
     }
   });
-
-  /* ---------------- New-data polling ---------------- */
-  /* Vercel redeploys on every push from the data-refresh workflow, but a tab
-     that is already open would keep showing the copy it was served. So poll
-     the fingerprint file fetch_journals.py writes beside this page. That file
-     holds a hash of the embedded records rather than a timestamp, so a
-     refresh run where Zoho returned identical data never disturbs anyone --
-     only a real change does.
-
-     A reload is never allowed to destroy work: if the viewer has filtered,
-     re-sorted, or paged away from the defaults, the banner waits for them to
-     click it. Only an untouched view reloads on its own, and only after
-     IDLE_MS with no interaction. */
-
-  var VERSION_URL = 'journals-version.json';
-  var POLL_MS = 60000;
-  var IDLE_MS = 30000;
-  var IDLE_CHECK_MS = 5000;
-
-  var knownVersion = null;
-  var pendingVersion = null;
-  var lastInteractionAt = Date.now();
-
-  /* Capture phase, because scroll does not bubble and the table scrolls in
-     its own container. */
-  ['pointerdown', 'keydown', 'wheel', 'touchstart', 'scroll'].forEach(function (name) {
-    window.addEventListener(name, function () {
-      lastInteractionAt = Date.now();
-    }, { capture: true, passive: true });
-  });
-
-  function viewIsPristine() {
-    return state.status === 'all' && !state.dateFrom && !state.dateTo &&
-      state.page === 1 && state.sortKey === 'date' && state.sortDir === 'desc';
-  }
-
-  function showUpdateBanner() {
-    if (document.getElementById('updateBanner')) return;
-
-    var bar = document.createElement('div');
-    bar.className = 'update-banner';
-    bar.id = 'updateBanner';
-    bar.setAttribute('role', 'status');
-    bar.setAttribute('aria-live', 'polite');
-
-    var msg = document.createElement('span');
-    msg.textContent = 'Newer Zoho data has been published.';
-    bar.appendChild(msg);
-
-    var reloadBtn = document.createElement('button');
-    reloadBtn.className = 'btn';
-    reloadBtn.type = 'button';
-    reloadBtn.textContent = 'Reload';
-    reloadBtn.addEventListener('click', function () { location.reload(); });
-    bar.appendChild(reloadBtn);
-
-    var dismissBtn = document.createElement('button');
-    dismissBtn.className = 'btn btn-ghost';
-    dismissBtn.type = 'button';
-    dismissBtn.textContent = 'Not now';
-    /* Accepting the pending version as known stops this tab nagging about it
-       -- and stops it auto-reloading to it -- while still speaking up if a
-       later refresh brings something different again. */
-    dismissBtn.addEventListener('click', function () {
-      knownVersion = pendingVersion;
-      bar.parentNode.removeChild(bar);
-    });
-    bar.appendChild(dismissBtn);
-
-    document.body.appendChild(bar);
-  }
-
-  function pollForNewData() {
-    fetch(VERSION_URL, { cache: 'no-store' })
-      .then(function (res) { return res.ok ? res.json() : null; })
-      .then(function (body) {
-        if (!body || typeof body.data_version !== 'string') return;
-        if (knownVersion === null) {
-          knownVersion = body.data_version;
-          return;
-        }
-        if (body.data_version !== knownVersion) {
-          pendingVersion = body.data_version;
-          showUpdateBanner();
-        }
-      })
-      .catch(function () {
-        /* Offline, opened as a double-clicked file:// page, or caught
-           mid-deploy. There is nothing useful to tell the viewer, so stay
-           quiet and try again on the next tick. */
-      });
-  }
-
-  function autoReloadIfIdle() {
-    if (pendingVersion === null || pendingVersion === knownVersion) return;
-    if (!viewIsPristine()) return;
-    if (Date.now() - lastInteractionAt < IDLE_MS) return;
-    location.reload();
-  }
-
-  if (typeof fetch === 'function') {
-    pollForNewData();
-    setInterval(pollForNewData, POLL_MS);
-    setInterval(autoReloadIfIdle, IDLE_CHECK_MS);
-  }
 
   init();
 })();

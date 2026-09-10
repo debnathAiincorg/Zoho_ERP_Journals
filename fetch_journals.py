@@ -10,10 +10,10 @@ Every full-list fetch is restricted to journals whose reference_number is
 some format/case variant of "Pay Order" (e.g. "PAY ORDER", "Pay-Order",
 "PayOrder") -- everything else (FD, FD - SM, etc.) is scanned but filtered
 out before it ever reaches disk. journals_output.json (the raw data) and the
-embedded JSON block inside public/journals_dashboard.html
+embedded JSON block inside journals_dashboard.html
 (<script type="application/json" id="journals-data">) therefore only ever
-contain Pay Order records, so the dashboard is self-contained and works when
-double-clicked from file:// -- no local server needed.
+contain Pay Order records, so journals_dashboard.html is self-contained and
+works when double-clicked from file:// -- no local server needed.
 
 The /erp/v3/journals LIST endpoint (used above) is summary-level only -- it
 does not include a journal's `notes` field or its line items. To populate a
@@ -31,7 +31,6 @@ script only handles ongoing auto-refresh, never the initial grant-token
 exchange.
 """
 import argparse
-import hashlib
 import json
 import re
 import sys
@@ -49,19 +48,7 @@ from zoho_client import (
 
 VALID_STATUSES = ("draft", "published", "approved", "submitted", "rejected")
 DEFAULT_OUT = "journals_output.json"
-# Lives under public/ because that is the only directory Vercel serves (see
-# vercel.json's outputDirectory) -- the Python sources, docs, and the raw
-# *_output.json snapshots deliberately stay outside it. Paths are relative to
-# the CWD the script is run from, i.e. the repo root, both locally and in
-# .github/workflows/fetch-zoho-data.yml.
-DASHBOARD_HTML = "public/journals_dashboard.html"
-# Tiny sidecar the deployed dashboard polls to notice that its data changed.
-# It holds a fingerprint of the embedded records, NOT a timestamp: the
-# "Last updated" stamp below necessarily changes on every run (that is the
-# point of it -- it proves the data was re-verified), so keying a reload
-# prompt off a timestamp would interrupt viewers on runs where Zoho returned
-# byte-identical data. A fingerprint changes only when the data really did.
-VERSION_JSON = "public/journals-version.json"
+DASHBOARD_HTML = "journals_dashboard.html"
 DATA_BLOCK_RE = re.compile(
     r'(<script type="application/json" id="journals-data">)(.*?)(</script>)',
     re.DOTALL,
@@ -140,7 +127,7 @@ def _update_dashboard_html(records: list, path: str) -> bool:
 
 
 def _update_last_updated_html(path: str) -> bool:
-    """Stamp the current UTC time into the dashboard's embedded
+    """Stamp the current UTC time into journals_dashboard.html's embedded
     <script type="application/json" id="last-updated"> block, so the
     "Current date" KPI and the "Last updated" note reflect when this script
     actually ran, not just when a viewer's browser happened to load the
@@ -163,19 +150,6 @@ def _update_last_updated_html(path: str) -> bool:
     with open(path, "w", encoding="utf-8") as f:
         f.write(new_html)
     return True
-
-
-def _write_version_json(path: str, records: list) -> None:
-    """Write the fingerprint sidecar that open dashboard tabs poll.
-
-    sort_keys makes the digest depend only on the data itself, not on Zoho's
-    key ordering, so an unchanged dataset always fingerprints identically.
-    """
-    digest = hashlib.sha256(
-        json.dumps(records, sort_keys=True).encode("utf-8")
-    ).hexdigest()[:16]
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump({"data_version": digest}, f)
 
 
 def main(argv=None) -> int:
@@ -235,8 +209,6 @@ def main(argv=None) -> int:
                 print(f"Updated embedded data in {DASHBOARD_HTML}")
                 if _update_last_updated_html(DASHBOARD_HTML):
                     print(f"Stamped last-updated timestamp in {DASHBOARD_HTML}")
-                _write_version_json(VERSION_JSON, result)
-                print(f"Wrote {VERSION_JSON} (polled by open dashboard tabs)")
                 print()
                 print(f"{DASHBOARD_HTML} updated with this run's data -- just open it "
                       "directly, no server needed.")
