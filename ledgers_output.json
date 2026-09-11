@@ -22,19 +22,19 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000002949019",
+        "source_id": "3545384000002949034",
         "date": "2026-09-10",
-        "reference_number": "PAY ORDER",
-        "description": "Create a pay-order \nPayment from petty cash\n\nDate- 10.09.2026 \n\nWashroom Renovation \nBlack stone purchase- 240/-\nTRANSPORT -50/-\nTAP WATER STOPPER 10/-",
+        "reference_number": "",
+        "description": "BLACK STONE PURCHASE",
         "debit_amount": 240.0,
         "credit_amount": 0
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000002949019",
+        "source_id": "3545384000002949034",
         "date": "2026-09-10",
-        "reference_number": "PAY ORDER",
-        "description": "Create a pay-order \nPayment from petty cash\n\nDate- 10.09.2026 \n\nWashroom Renovation \nBlack stone purchase- 240/-\nTRANSPORT -50/-\nTAP WATER STOPPER 10/-",
+        "reference_number": "",
+        "description": "tap WATER STOPPER",
         "debit_amount": 10.0,
         "credit_amount": 0
       },
