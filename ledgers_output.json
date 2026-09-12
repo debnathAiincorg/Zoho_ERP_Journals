@@ -4,6 +4,15 @@
     "entries": [
       {
         "source_type": "journal",
+        "source_id": "3545384000003012001",
+        "date": "2026-09-12",
+        "reference_number": "PAY ORDER",
+        "description": "Create a pay-order \nPayment to UPI\n\nDate- 13.09.2026 & 14.09.2026\n\nWashroom Renovation (Tiles Work)\n\nMistry - 1-800/-\nLabourer -1-600/-\nMachine- 200\nTotal -1600/-\n\n2 days - 3200/-",
+        "debit_amount": 3200.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
         "source_id": "3545384000002850049",
         "date": "2026-09-10",
         "reference_number": "PAY ORDER",
@@ -1429,6 +1438,15 @@
   "OFFICE 2 PROJECT.": {
     "account_id": "3545384000000396025",
     "entries": [
+      {
+        "source_type": "journal",
+        "source_id": "3545384000003007016",
+        "date": "2026-09-12",
+        "reference_number": "PAY ORDER",
+        "description": "Create a pay-order \nPayment to - Suraj da \n\nDate-12.09.2026\n\nO2 Carpenter work (switch box cutting)\n\nMistree-200/-",
+        "debit_amount": 200.0,
+        "credit_amount": 0
+      },
       {
         "source_type": "journal",
         "source_id": "3545384000002745011",
