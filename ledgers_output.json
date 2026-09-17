@@ -1494,6 +1494,15 @@
     "entries": [
       {
         "source_type": "journal",
+        "source_id": "3545384000003117001",
+        "date": "2026-09-17",
+        "reference_number": "PAY ORDER",
+        "description": "Create a Pay-Order \nPayment to Rana da\n\nDate- 17.09.2026\n\nProject - O2 Lab 1 (Wall Putti & Paint work)\n\nPainter -1- 800/-",
+        "debit_amount": 800.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
         "source_id": "3545384000003080029",
         "date": "2026-09-17",
         "reference_number": "PAY ORDER",
