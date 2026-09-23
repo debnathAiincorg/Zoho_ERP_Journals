@@ -4,6 +4,24 @@
     "entries": [
       {
         "source_type": "journal",
+        "source_id": "3545384000003235031",
+        "date": "2026-09-23",
+        "reference_number": "PAY ORDER",
+        "description": "Create a pay-order \nPayment to Saifulla Molla through Pratim\n\nDate- 23.09.2026 & 24.09.2026\n\nProject Name - Washroom Renovation (Tiles Work)\n\nMistry - 1-800/-\nLabourer -1-600/-\nMachine- 400\nTotal -1800/-\n\n2 days - 3600/-",
+        "debit_amount": 3600.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000003239001",
+        "date": "2026-09-23",
+        "reference_number": "PAY ORDER",
+        "description": "MATERIAL SAND 1BAG",
+        "debit_amount": 140.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
         "source_id": "3545384000003202049",
         "date": "2026-09-22",
         "reference_number": "PAY ORDER",
