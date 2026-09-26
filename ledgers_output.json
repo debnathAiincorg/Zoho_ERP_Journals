@@ -1525,6 +1525,24 @@
       },
       {
         "source_type": "bill",
+        "source_id": "3545384000001588002",
+        "date": "2026-02-04",
+        "reference_number": "",
+        "description": "VENTILATION FAN",
+        "debit_amount": 2184.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001519002",
+        "date": "2026-06-23",
+        "reference_number": "",
+        "description": "Aquieen double flush cistern",
+        "debit_amount": 1393.05,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
         "source_id": "3545384000001312010",
         "date": "2026-06-10",
         "reference_number": "",
