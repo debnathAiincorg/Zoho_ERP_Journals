@@ -1506,6 +1506,24 @@
         "credit_amount": 0
       },
       {
+        "source_type": "journal",
+        "source_id": "3545384000000320045",
+        "date": "2026-02-12",
+        "reference_number": "",
+        "description": "AMAZON PURCHASE WASHROOM CISTERN",
+        "debit_amount": 6440.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000197023",
+        "date": "2026-01-16",
+        "reference_number": "",
+        "description": "8X8X11 FLOOR DRAIN",
+        "debit_amount": 2600.35,
+        "credit_amount": 0
+      },
+      {
         "source_type": "bill",
         "source_id": "3545384000003169056",
         "date": "2026-09-21",
@@ -1656,6 +1674,15 @@
         "reference_number": "",
         "description": "Milwakey Water Pump",
         "debit_amount": 48000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000000306025",
+        "date": "2026-02-07",
+        "reference_number": "",
+        "description": "Sink,",
+        "debit_amount": 7500.0,
         "credit_amount": 0
       }
     ]
@@ -2106,24 +2133,6 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000001531009",
-        "date": "2026-06-24",
-        "reference_number": "PAY ORDER",
-        "description": "payment to Pratim for NL color purchase\n\n23.06.26\nputti 1bag @ Rs 670 \nprimer 4 ltre @ Rs. 650\n8 inch fibre 2 pcs @ Rs. 40\ncloth @ Rs. 60\n4 inch brass @ Rs. 190\ntotal = Rs. 1610\n\nPayment to @Srijan \nWood primer- 890/-\nAdjusted 650/-for wall primer \nTarpin oil -2l - 220/-\nTotal amount- 240+220=460/-",
-        "debit_amount": 460.0,
-        "credit_amount": 0
-      },
-      {
-        "source_type": "journal",
-        "source_id": "3545384000001526026",
-        "date": "2026-06-24",
-        "reference_number": "PAY ORDER",
-        "description": "Payment to Rana dada\n\n24.06.26\n\nO2 paint work\nMaterial Purchase - 1050/-",
-        "debit_amount": 1050.0,
-        "credit_amount": 0
-      },
-      {
-        "source_type": "journal",
         "source_id": "3545384000001532012",
         "date": "2026-06-24",
         "reference_number": "PAY ORDER",
@@ -2142,11 +2151,20 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000001523001",
-        "date": "2026-06-23",
-        "reference_number": "Pay order",
-        "description": "payment to Pratim for NL color purchase\n\n23.06.26\nputti 1bag @ Rs 670 \nprimer 4 ltre @ Rs. 650\n8 inch fibre 2 pcs @ Rs. 40\ncloth @ Rs. 60\n4 inch brass @ Rs. 190\ntotal = Rs. 1610",
-        "debit_amount": 1610.0,
+        "source_id": "3545384000001531009",
+        "date": "2026-06-24",
+        "reference_number": "PAY ORDER",
+        "description": "payment to Pratim for NL color purchase\n\n23.06.26\nputti 1bag @ Rs 670 \nprimer 4 ltre @ Rs. 650\n8 inch fibre 2 pcs @ Rs. 40\ncloth @ Rs. 60\n4 inch brass @ Rs. 190\ntotal = Rs. 1610\n\nPayment to @Srijan \nWood primer- 890/-\nAdjusted 650/-for wall primer \nTarpin oil -2l - 220/-\nTotal amount- 240+220=460/-",
+        "debit_amount": 460.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001526026",
+        "date": "2026-06-24",
+        "reference_number": "PAY ORDER",
+        "description": "Payment to Rana dada\n\n24.06.26\n\nO2 paint work\nMaterial Purchase - 1050/-",
+        "debit_amount": 1050.0,
         "credit_amount": 0
       },
       {
@@ -2160,11 +2178,11 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000001494001",
-        "date": "2026-06-22",
-        "reference_number": "PAY ORDER",
-        "description": "Payment to Pratim \nO2 Electrical purchase \n22.06.26\n\n0.75mm  3 coil red black 1300*3=3900/-",
-        "debit_amount": 3900.0,
+        "source_id": "3545384000001523001",
+        "date": "2026-06-23",
+        "reference_number": "Pay order",
+        "description": "payment to Pratim for NL color purchase\n\n23.06.26\nputti 1bag @ Rs 670 \nprimer 4 ltre @ Rs. 650\n8 inch fibre 2 pcs @ Rs. 40\ncloth @ Rs. 60\n4 inch brass @ Rs. 190\ntotal = Rs. 1610",
+        "debit_amount": 1610.0,
         "credit_amount": 0
       },
       {
@@ -2174,6 +2192,15 @@
         "reference_number": "PAY ORDER - MATERIAL",
         "description": "Payment to Pratim \nO2 Electrical purchase \n22.06.26\n\n2 model plate-45- 60*45=2700/-\n0.75mm  2 coil red black 1300*2=2600/-\nPvc tape- 5-10*5=50/-\nEstate pipe 20pcs half inch-35*20=700/-\n4 model plate  - 6-85*6=510/-\n\nTotal Amount - 6565",
         "debit_amount": 6564.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001494001",
+        "date": "2026-06-22",
+        "reference_number": "PAY ORDER",
+        "description": "Payment to Pratim \nO2 Electrical purchase \n22.06.26\n\n0.75mm  3 coil red black 1300*3=3900/-",
+        "debit_amount": 3900.0,
         "credit_amount": 0
       },
       {
@@ -2214,20 +2241,20 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000000863014",
-        "date": "2026-05-21",
-        "reference_number": "",
-        "description": "D. Dasgupta",
-        "debit_amount": 100.0,
-        "credit_amount": 0
-      },
-      {
-        "source_type": "journal",
         "source_id": "3545384000000893009",
         "date": "2026-05-21",
         "reference_number": "",
         "description": "RENOVATION EXPENSE SURAJ SHARMA 9B",
         "debit_amount": 1000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000879001",
+        "date": "2026-05-21",
+        "reference_number": "",
+        "description": "Office related hardware purchased",
+        "debit_amount": 80.0,
         "credit_amount": 0
       },
       {
@@ -2241,11 +2268,11 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000000879001",
+        "source_id": "3545384000000863014",
         "date": "2026-05-21",
         "reference_number": "",
-        "description": "Office related hardware purchased",
-        "debit_amount": 80.0,
+        "description": "D. Dasgupta",
+        "debit_amount": 100.0,
         "credit_amount": 0
       },
       {
@@ -2588,6 +2615,15 @@
         "reference_number": "",
         "description": "Movable bracket",
         "debit_amount": 189.52,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000000346021",
+        "date": "2026-02-14",
+        "reference_number": "",
+        "description": "2LED PANEL WARM LIGHT",
+        "debit_amount": 9776.65,
         "credit_amount": 0
       }
     ]
