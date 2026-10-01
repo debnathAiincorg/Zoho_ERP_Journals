@@ -1579,6 +1579,15 @@
       },
       {
         "source_type": "bill",
+        "source_id": "3545384000003451002",
+        "date": "2026-10-01",
+        "reference_number": "",
+        "description": "L shaped self adhesive tape",
+        "debit_amount": 290.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
         "source_id": "3545384000003169056",
         "date": "2026-09-21",
         "reference_number": "",
