@@ -1827,11 +1827,11 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000003077001",
+        "source_id": "3545384000003117001",
         "date": "2026-09-17",
         "reference_number": "PAY ORDER",
-        "description": "Create a Pay-Order \nPayment to Rana da\n\nDate- 16.09.2026\n\nProject - O2 Lab 1 (Wall Putti work)\n\nPainter -1- 800/-\nRana Da (Monitoring) - 1000/-",
-        "debit_amount": 1800.0,
+        "description": "Create a Pay-Order \nPayment to Rana da\n\nDate- 17.09.2026\n\nProject - O2 Lab 1 (Wall Putti & Paint work)\n\nPainter -1- 800/-",
+        "debit_amount": 800.0,
         "credit_amount": 0
       },
       {
@@ -1845,11 +1845,11 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000003117001",
+        "source_id": "3545384000003077001",
         "date": "2026-09-17",
         "reference_number": "PAY ORDER",
-        "description": "Create a Pay-Order \nPayment to Rana da\n\nDate- 17.09.2026\n\nProject - O2 Lab 1 (Wall Putti & Paint work)\n\nPainter -1- 800/-",
-        "debit_amount": 800.0,
+        "description": "Create a Pay-Order \nPayment to Rana da\n\nDate- 16.09.2026\n\nProject - O2 Lab 1 (Wall Putti work)\n\nPainter -1- 800/-\nRana Da (Monitoring) - 1000/-",
+        "debit_amount": 1800.0,
         "credit_amount": 0
       },
       {
@@ -1962,11 +1962,11 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000001744009",
+        "source_id": "3545384000001746009",
         "date": "2026-07-09",
         "reference_number": "PAY ORDER",
-        "description": "Payment to Rana dada\n\n08.07.26\nWashroom Renovation& O2 Ply work \nRana da (Monitor)- 1500/-",
-        "debit_amount": 750.0,
+        "description": "Payment to Rana da\n\n08.07.26\nWashroom Renovation \n\nMistree- 850/-\nLabour- 650/-",
+        "debit_amount": 1500.0,
         "credit_amount": 0
       },
       {
@@ -1980,11 +1980,11 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000001746009",
+        "source_id": "3545384000001744009",
         "date": "2026-07-09",
         "reference_number": "PAY ORDER",
-        "description": "Payment to Rana da\n\n08.07.26\nWashroom Renovation \n\nMistree- 850/-\nLabour- 650/-",
-        "debit_amount": 1500.0,
+        "description": "Payment to Rana dada\n\n08.07.26\nWashroom Renovation& O2 Ply work \nRana da (Monitor)- 1500/-",
+        "debit_amount": 750.0,
         "credit_amount": 0
       },
       {
@@ -2016,11 +2016,11 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000001680009",
+        "source_id": "3545384000001698030",
         "date": "2026-07-04",
         "reference_number": "PAY ORDER",
-        "description": "Payment to Rana dada UPI\nO2 Ply Work \n\n03.07.26\nMaterial Purchase \nWood -1221/-\nHardware  material-578/-",
-        "debit_amount": 1799.0,
+        "description": "Payment to Rana dada\n\n04.07.26\nWashroom Renovation & O2 Electrical work \nRana da (Monitor)- 1500/-",
+        "debit_amount": 750.0,
         "credit_amount": 0
       },
       {
@@ -2029,33 +2029,6 @@
         "date": "2026-07-04",
         "reference_number": "PAY ORDER",
         "description": "Payment to Suraj da upi\nO2 carpenter work \n\n01.07.26\nMistree-2- 1600/-",
-        "debit_amount": 1600.0,
-        "credit_amount": 0
-      },
-      {
-        "source_type": "journal",
-        "source_id": "3545384000001674007",
-        "date": "2026-07-04",
-        "reference_number": "PAY ORDER",
-        "description": "Payment to Saraswati Ply Wood upi\nO2 ply Work\n\n02.07.26\nPly purchase- 3250/-",
-        "debit_amount": 3250.0,
-        "credit_amount": 0
-      },
-      {
-        "source_type": "journal",
-        "source_id": "3545384000001680015",
-        "date": "2026-07-04",
-        "reference_number": "PAY ORDER",
-        "description": "Payment to Rana dada\nO2 Ply Work \n\n03.07.26\nMaterial Purchase UPI\nWood -840/-",
-        "debit_amount": 840.0,
-        "credit_amount": 0
-      },
-      {
-        "source_type": "journal",
-        "source_id": "3545384000001686004",
-        "date": "2026-07-04",
-        "reference_number": "PAY ORDER",
-        "description": "Payment to Suraj da UPI \nO2 carpenter work \n\n03.07.26\nMistree-2- 1600/-",
         "debit_amount": 1600.0,
         "credit_amount": 0
       },
@@ -2070,11 +2043,38 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000001698030",
+        "source_id": "3545384000001686004",
         "date": "2026-07-04",
         "reference_number": "PAY ORDER",
-        "description": "Payment to Rana dada\n\n04.07.26\nWashroom Renovation & O2 Electrical work \nRana da (Monitor)- 1500/-",
-        "debit_amount": 750.0,
+        "description": "Payment to Suraj da UPI \nO2 carpenter work \n\n03.07.26\nMistree-2- 1600/-",
+        "debit_amount": 1600.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001680015",
+        "date": "2026-07-04",
+        "reference_number": "PAY ORDER",
+        "description": "Payment to Rana dada\nO2 Ply Work \n\n03.07.26\nMaterial Purchase UPI\nWood -840/-",
+        "debit_amount": 840.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001680009",
+        "date": "2026-07-04",
+        "reference_number": "PAY ORDER",
+        "description": "Payment to Rana dada UPI\nO2 Ply Work \n\n03.07.26\nMaterial Purchase \nWood -1221/-\nHardware  material-578/-",
+        "debit_amount": 1799.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001674007",
+        "date": "2026-07-04",
+        "reference_number": "PAY ORDER",
+        "description": "Payment to Saraswati Ply Wood upi\nO2 ply Work\n\n02.07.26\nPly purchase- 3250/-",
+        "debit_amount": 3250.0,
         "credit_amount": 0
       },
       {
@@ -2133,15 +2133,6 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000001597029",
-        "date": "2026-06-29",
-        "reference_number": "PAY ORDER",
-        "description": "Payment to Rana dada\n\n28.06.26\nWashroom Renovation  & O2 paint work \nRana da (Monitor)- 1500/-",
-        "debit_amount": 750.0,
-        "credit_amount": 0
-      },
-      {
-        "source_type": "journal",
         "source_id": "3545384000001608015",
         "date": "2026-06-29",
         "reference_number": "PAY ORDER",
@@ -2160,19 +2151,10 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000001594033",
-        "date": "2026-06-27",
+        "source_id": "3545384000001597029",
+        "date": "2026-06-29",
         "reference_number": "PAY ORDER",
-        "description": "Payment to Rana dada\n\n27.06.26\nWashroom Renovation \nSantaras 1200/-& Labour- 2*650 =1300\n\n\nO2 paint work \nPainter-750/-",
-        "debit_amount": 750.0,
-        "credit_amount": 0
-      },
-      {
-        "source_type": "journal",
-        "source_id": "3545384000001572038",
-        "date": "2026-06-27",
-        "reference_number": "",
-        "description": "Payment to Rana dada\n\n26.06.26\nWashroom Renovation \nSantaras 1200/-& Labour-650/-\n\n\nO2 paint work \nPainter-750/-",
+        "description": "Payment to Rana dada\n\n28.06.26\nWashroom Renovation  & O2 paint work \nRana da (Monitor)- 1500/-",
         "debit_amount": 750.0,
         "credit_amount": 0
       },
@@ -2192,6 +2174,24 @@
         "reference_number": "PAY ORDER",
         "description": "Payment to Srijan Banerjee 27/06/26\nHanger for O2 \u20b9250",
         "debit_amount": 250.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001594033",
+        "date": "2026-06-27",
+        "reference_number": "PAY ORDER",
+        "description": "Payment to Rana dada\n\n27.06.26\nWashroom Renovation \nSantaras 1200/-& Labour- 2*650 =1300\n\n\nO2 paint work \nPainter-750/-",
+        "debit_amount": 750.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001572038",
+        "date": "2026-06-27",
+        "reference_number": "",
+        "description": "Payment to Rana dada\n\n26.06.26\nWashroom Renovation \nSantaras 1200/-& Labour-650/-\n\n\nO2 paint work \nPainter-750/-",
+        "debit_amount": 750.0,
         "credit_amount": 0
       },
       {
@@ -2286,20 +2286,20 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000001494001",
-        "date": "2026-06-22",
-        "reference_number": "PAY ORDER",
-        "description": "Payment to Pratim \nO2 Electrical purchase \n22.06.26\n\n0.75mm  3 coil red black 1300*3=3900/-",
-        "debit_amount": 3900.0,
-        "credit_amount": 0
-      },
-      {
-        "source_type": "journal",
         "source_id": "3545384000001474009",
         "date": "2026-06-22",
         "reference_number": "PAY ORDER - MATERIAL",
         "description": "Payment to Pratim \nO2 Electrical purchase \n22.06.26\n\n2 model plate-45- 60*45=2700/-\n0.75mm  2 coil red black 1300*2=2600/-\nPvc tape- 5-10*5=50/-\nEstate pipe 20pcs half inch-35*20=700/-\n4 model plate  - 6-85*6=510/-\n\nTotal Amount - 6565",
         "debit_amount": 6564.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001494001",
+        "date": "2026-06-22",
+        "reference_number": "PAY ORDER",
+        "description": "Payment to Pratim \nO2 Electrical purchase \n22.06.26\n\n0.75mm  3 coil red black 1300*3=3900/-",
+        "debit_amount": 3900.0,
         "credit_amount": 0
       },
       {
@@ -2457,20 +2457,20 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000001195042",
-        "date": "2026-03-09",
-        "reference_number": "",
-        "description": "NL OFFICE CARPENTER WORK",
-        "debit_amount": 3500.0,
-        "credit_amount": 0
-      },
-      {
-        "source_type": "journal",
         "source_id": "3545384000001195031",
         "date": "2026-03-09",
         "reference_number": "",
         "description": "NL OFFCIE BAMBOO WORK",
         "debit_amount": 500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000001195042",
+        "date": "2026-03-09",
+        "reference_number": "",
+        "description": "NL OFFICE CARPENTER WORK",
+        "debit_amount": 3500.0,
         "credit_amount": 0
       },
       {
