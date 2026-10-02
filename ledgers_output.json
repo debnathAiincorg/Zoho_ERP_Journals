@@ -1597,6 +1597,15 @@
       },
       {
         "source_type": "bill",
+        "source_id": "3545384000003490011",
+        "date": "2026-10-02",
+        "reference_number": "",
+        "description": "FAUCET FITTING LONGER PIPE",
+        "debit_amount": 2320.99,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
         "source_id": "3545384000003451002",
         "date": "2026-10-01",
         "reference_number": "",
