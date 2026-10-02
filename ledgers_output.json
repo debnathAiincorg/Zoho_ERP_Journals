@@ -1570,11 +1570,29 @@
       },
       {
         "source_type": "journal",
+        "source_id": "3545384000000199023",
+        "date": "2026-01-17",
+        "reference_number": "",
+        "description": "AMAZON REFUND AQUEEN MAGNETIC SHOWER TUBE",
+        "debit_amount": 0,
+        "credit_amount": 1820.0
+      },
+      {
+        "source_type": "journal",
         "source_id": "3545384000000197023",
         "date": "2026-01-16",
         "reference_number": "",
         "description": "8X8X11 FLOOR DRAIN",
         "debit_amount": 2600.35,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000144059",
+        "date": "2026-01-06",
+        "reference_number": "",
+        "description": "Amazon purchase shower tubes",
+        "debit_amount": 3615.0,
         "credit_amount": 0
       },
       {
@@ -1753,6 +1771,15 @@
   "OFFICE 2 PROJECT.": {
     "account_id": "3545384000000396025",
     "entries": [
+      {
+        "source_type": "journal",
+        "source_id": "3545384000003464001",
+        "date": "2026-10-02",
+        "reference_number": "PAY ORDER",
+        "description": "\nPayment to Ranjit Sharma through Srijan Banerjee \n\nDate- 01.10.2026 \n\nProject Name - O2 lab 1 (Corian work )\n\nTotal -4000 /-",
+        "debit_amount": 4000.0,
+        "credit_amount": 0
+      },
       {
         "source_type": "journal",
         "source_id": "3545384000003384025",
@@ -2730,6 +2757,15 @@
   "Food and Brev E": {
     "account_id": "3545384000001527002",
     "entries": [
+      {
+        "source_type": "journal",
+        "source_id": "3545384000003452001",
+        "date": "2026-10-02",
+        "reference_number": "PAY ORDER",
+        "description": "Create a pay-order \nPayment to Rajkumar da through Pratim Rath\n\nDate- 14.09.2026 - 30.09.2026\n\nProject Name - O1 washroom Renovation & O2 Lab 1\n\nLabour Expenses \n(Tea & Biscuit expenses)\n\nTea - 42 -252/-\nBiscuit-2-4/-\nTotal amount - 256/-",
+        "debit_amount": 256.0,
+        "credit_amount": 0
+      },
       {
         "source_type": "journal",
         "source_id": "3545384000003399016",
