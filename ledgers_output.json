@@ -2673,6 +2673,24 @@
       },
       {
         "source_type": "bill",
+        "source_id": "3545384000002953002",
+        "date": "2026-09-09",
+        "reference_number": "",
+        "description": "PANASONIC DEEP DOWN LIGHT 12 W",
+        "debit_amount": 2574.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000002831002",
+        "date": "2026-09-03",
+        "reference_number": "",
+        "description": "PANASONIC 12W DEEP DOWN ROUNT LIGHT",
+        "debit_amount": 3432.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
         "source_id": "3545384000002529022",
         "date": "2026-08-18",
         "reference_number": "",
