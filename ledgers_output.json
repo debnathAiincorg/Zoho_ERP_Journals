@@ -1791,6 +1791,24 @@
     "entries": [
       {
         "source_type": "journal",
+        "source_id": "3545384000003563010",
+        "date": "2026-10-06",
+        "reference_number": "PAY ORDER",
+        "description": "Create a Pay-order \nPayment to Debasish Mazumder \n\nDate- 06.10.2026 \n\nProject Name -O2 Lab 1 (Electric work- light fixing, switch board fixing)\n\nMistry - 3540/-\nPrevious due - 2700/- (10.07.2026)\n\nTotal-6240/-",
+        "debit_amount": 3540.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000003563010",
+        "date": "2026-10-06",
+        "reference_number": "PAY ORDER",
+        "description": "FOR PREVIOUS DUE PAYMENT",
+        "debit_amount": 2700.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
         "source_id": "3545384000003464001",
         "date": "2026-10-02",
         "reference_number": "PAY ORDER",
