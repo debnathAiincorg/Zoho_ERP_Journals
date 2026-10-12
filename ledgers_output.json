@@ -2948,11 +2948,11 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000001711016",
+        "source_id": "3545384000001714037",
         "date": "2026-07-08",
         "reference_number": "PAY ORDER",
-        "description": "Payment to Rajkumar da UPI\n\n05.07.26\n\nLabour Tiffin Expenses \nTea- 17-102/-\nBiscuit - 4- 8/-",
-        "debit_amount": 110.0,
+        "description": "Payment to Rajkumar da UPI\n\n03.07.26\n\nLabour Tiffin Expenses \nTea- 9-54/-\nBiscuit - 3- 6/-",
+        "debit_amount": 60.0,
         "credit_amount": 0
       },
       {
@@ -2966,11 +2966,11 @@
       },
       {
         "source_type": "journal",
-        "source_id": "3545384000001714037",
+        "source_id": "3545384000001711016",
         "date": "2026-07-08",
         "reference_number": "PAY ORDER",
-        "description": "Payment to Rajkumar da UPI\n\n03.07.26\n\nLabour Tiffin Expenses \nTea- 9-54/-\nBiscuit - 3- 6/-",
-        "debit_amount": 60.0,
+        "description": "Payment to Rajkumar da UPI\n\n05.07.26\n\nLabour Tiffin Expenses \nTea- 17-102/-\nBiscuit - 4- 8/-",
+        "debit_amount": 110.0,
         "credit_amount": 0
       },
       {
