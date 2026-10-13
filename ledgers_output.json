@@ -4,6 +4,24 @@
     "entries": [
       {
         "source_type": "journal",
+        "source_id": "3545384000003723012",
+        "date": "2026-10-12",
+        "reference_number": "",
+        "description": "SINK CATCHER(WASHROOM)",
+        "debit_amount": 75.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000003723012",
+        "date": "2026-10-12",
+        "reference_number": "",
+        "description": "ANIL PAYMENT WASHROOM CLEAN",
+        "debit_amount": 300.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
         "source_id": "3545384000003481074",
         "date": "2026-10-02",
         "reference_number": "PAY ORDER",
