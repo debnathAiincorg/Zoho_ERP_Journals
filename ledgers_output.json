@@ -103,6 +103,15 @@
       },
       {
         "source_type": "journal",
+        "source_id": "3545384000003307059",
+        "date": "2026-09-26",
+        "reference_number": "PAY ORDER",
+        "description": "Payment to Karnafuli through Pratim\n\nDate- 26.09.2026\nProject - Washroom Renovation(Tiles grout work)\n\nMaterial purchase -Grout 1kg- 90/-",
+        "debit_amount": 90.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
         "source_id": "3545384000003326001",
         "date": "2026-09-26",
         "reference_number": "PAY ORDER",
@@ -207,6 +216,15 @@
         "reference_number": "PAY ORDER",
         "description": "Create a pay-order \nPayment to - Suraj da \n\nDate-14.09.2026\n\nO1 washroom Carpenter work (Temporary Meter box cover)\n\nMistree-300/-",
         "debit_amount": 300.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000003012001",
+        "date": "2026-09-12",
+        "reference_number": "PAY ORDER",
+        "description": "Create a pay-order \nPayment to UPI\n\nDate- 13.09.2026 & 14.09.2026\n\nWashroom Renovation (Tiles Work)\n\nMistry - 1-800/-\nLabourer -1-600/-\nMachine- 200\nTotal -1600/-\n\n2 days - 3200/-",
+        "debit_amount": 3200.0,
         "credit_amount": 0
       },
       {
