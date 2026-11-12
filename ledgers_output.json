@@ -1579,11 +1579,29 @@
       },
       {
         "source_type": "journal",
+        "source_id": "3545384000001301001",
+        "date": "2026-06-10",
+        "reference_number": "",
+        "description": "MAINTAINANCE OF OFFICE SEPTIC TANK",
+        "debit_amount": 1500.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
         "source_id": "3545384000001302001",
         "date": "2026-06-10",
         "reference_number": "",
         "description": "WASHROOM REPAIR O1 TANK",
         "debit_amount": 900.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
+        "source_id": "3545384000000320045",
+        "date": "2026-02-12",
+        "reference_number": "",
+        "description": "AMAZON PURCHASE WASHROOM CISTERN",
+        "debit_amount": 6440.0,
         "credit_amount": 0
       },
       {
@@ -1597,11 +1615,200 @@
       },
       {
         "source_type": "journal",
+        "source_id": "3545384000000197023",
+        "date": "2026-01-16",
+        "reference_number": "",
+        "description": "8X8X11 FLOOR DRAIN",
+        "debit_amount": 2600.35,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "journal",
         "source_id": "3545384000000144059",
         "date": "2026-01-06",
         "reference_number": "",
         "description": "Amazon purchase shower tubes",
         "debit_amount": 3615.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000003490011",
+        "date": "2026-10-02",
+        "reference_number": "",
+        "description": "FAUCET FITTING LONGER PIPE",
+        "debit_amount": 2320.99,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000003451002",
+        "date": "2026-10-01",
+        "reference_number": "",
+        "description": "L shaped self adhesive tape",
+        "debit_amount": 290.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000003169056",
+        "date": "2026-09-21",
+        "reference_number": "",
+        "description": "JON VANDARI SINGLE SUCTION CUP",
+        "debit_amount": 523.99,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000003186034",
+        "date": "2026-09-21",
+        "reference_number": "",
+        "description": "TOMAHAWK 2 SIDE VACUME SUCTION CUP",
+        "debit_amount": 673.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000003180023",
+        "date": "2026-09-21",
+        "reference_number": "",
+        "description": "PLANTEX 5 INCH WASTE COUPLING",
+        "debit_amount": 859.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000003162061",
+        "date": "2026-09-21",
+        "reference_number": "",
+        "description": "B BACK LINE BRASS 7 WASTE COUPLING",
+        "debit_amount": 999.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000003103002",
+        "date": "2026-09-17",
+        "reference_number": "",
+        "description": "Plantex basin for washroom",
+        "debit_amount": 1972.06,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000003020033",
+        "date": "2026-09-14",
+        "reference_number": "",
+        "description": "WASHROOM DESIGN RECHANGES EXTRA CHARGES",
+        "debit_amount": 2000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000002929042",
+        "date": "2026-09-11",
+        "reference_number": "",
+        "description": "plantex single lever water tap",
+        "debit_amount": 599.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001900001",
+        "date": "2026-07-21",
+        "reference_number": "",
+        "description": "wassmist cistern",
+        "debit_amount": 1604.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001588002",
+        "date": "2026-02-04",
+        "reference_number": "",
+        "description": "VENTILATION FAN",
+        "debit_amount": 2184.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001519002",
+        "date": "2026-06-23",
+        "reference_number": "",
+        "description": "Aquieen double flush cistern",
+        "debit_amount": 1393.05,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001312010",
+        "date": "2026-06-10",
+        "reference_number": "",
+        "description": "MATERIAL",
+        "debit_amount": 115.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001312010",
+        "date": "2026-06-10",
+        "reference_number": "",
+        "description": "MATERIAL",
+        "debit_amount": 375.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001312010",
+        "date": "2026-06-10",
+        "reference_number": "",
+        "description": "LABOUR",
+        "debit_amount": 1900.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001312010",
+        "date": "2026-06-10",
+        "reference_number": "",
+        "description": "LABOUR",
+        "debit_amount": 1900.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001312010",
+        "date": "2026-06-10",
+        "reference_number": "",
+        "description": "LABOUR",
+        "debit_amount": 3100.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000001312010",
+        "date": "2026-06-10",
+        "reference_number": "",
+        "description": "LABOUR MONITORING ",
+        "debit_amount": 2999.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000000876009",
+        "date": "2026-05-20",
+        "reference_number": "",
+        "description": "Milwakey Water Pump",
+        "debit_amount": 48000.0,
+        "credit_amount": 0
+      },
+      {
+        "source_type": "bill",
+        "source_id": "3545384000000306025",
+        "date": "2026-02-07",
+        "reference_number": "",
+        "description": "Sink,",
+        "debit_amount": 7500.0,
         "credit_amount": 0
       }
     ]
